@@ -1,48 +1,42 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import Select from '../components/Select'
-import { INFO_CAT_SCREEN, INFO_CONTACT_SCREEN, INFO_MAP_SCREEN, INFO_NAME_SCREEN, INFO_PHONE_SCREEN, INFO_PHOTO_SCREEN, INFO_TITLE_SCREEN, INFO_TYPE_SCREEN, SOCIAL } from '../const'
+import { INFO_CAT_SCREEN, INFO_CONTACT_SCREEN, INFO_MAP_SCREEN, INFO_NAME_SCREEN, INFO_PHONE_SCREEN, 
+         INFO_PHOTO_SCREEN, INFO_TITLE_SCREEN, INFO_TYPE_SCREEN } from '../const'
 import useMap from '../hooks/map.hook'
-import useHttp from '../hooks/http.hook'
 import useSelect from '../hooks/select.hook'
 import useValidationInput from '../hooks/input.hook'
-import AuthContext from '../context/AuthContext'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faArrowLeftLong } from '@fortawesome/free-solid-svg-icons'
 import { useNavigate } from "react-router-dom";
-import Contact from '../components/Contact'
 import FileLoader from '../components/FileLoader'
 import useFileLoad from '../hooks/fileLoad.hook'
-import useMessage from '../hooks/message.hook'
+import useUser from '../hooks/user.hook'
+import useContacts from "../hooks/contacts.hook"
+import Contacts from '../components/Contacts'
+import useApi from '../hooks/api.hook'
+import { useSelector } from 'react-redux'
+import * as selectors from '../selectors'
+import Input from '../components/base/Input'
 
 
 
 function InfoPage() {
     const navigate = useNavigate()
-    const { token, inform, logout } = useContext(AuthContext)    
-    const { error, request, clearError } = useHttp()
-    const message = useMessage();
+    const { initialMaster, initialClient } = useApi()
+    const { refreshUser } = useUser()
 
-    useEffect(() => {
-        message(error);
-        clearError();
-    }, [error, message, clearError])
+    const categories = useSelector(selectors.categories)
+
+    const [type, setType] = useState('') 
+    const phone = useValidationInput('')
+    const name = useValidationInput('')
+    const select = useSelect(categories)
+    const { elem, marker } = useMap() 
+    const contact = useContacts() 
+    const images = useFileLoad({ multi: true, accept: ['.png', '.jpg', '.jpeg'] })
 
     const [currentPage, setCurrentPage] = useState(INFO_PHONE_SCREEN)
     const [stack, setStack] = useState([])
-
-    const [type, setType] = useState('') 
-    const phone = useValidationInput('', () => true)
-    //const code = useValidationInput('', () => true)
-    const name = useValidationInput('', () => true)
-    const select = useSelect()
-    const { elem, marker } = useMap() 
-
-    const telegram = useValidationInput('', () => true)
-    const instagram = useValidationInput('', () => true)
-    const facebook = useValidationInput('', () => true)
-    const whatsapp = useValidationInput('', () => true)
-   
-    const images = useFileLoad({ multi: true, accept: ['.png', '.jpg', '.jpeg'] })
 
     const nextHandler = (page) => { 
         setCurrentPage((prvPage) => {
@@ -62,12 +56,7 @@ function InfoPage() {
     const typeMasterNextHandler = () => { nextHandler(INFO_TITLE_SCREEN); setType('MASTER') } 
     const typeClientNextHandler = () => { nextHandler(INFO_NAME_SCREEN); setType('CLIENT') }
     const nameNextHandler = () => nextHandler(INFO_CONTACT_SCREEN)
-    const titleNextHandler = () => {
-        request('/api/info/get-categories', 'POST').then(({categories}) => {
-            if(categories) { select.changeList(categories) }
-            nextHandler(INFO_CAT_SCREEN)
-        })        
-    }
+    const titleNextHandler = () => { nextHandler(INFO_CAT_SCREEN) }
     const catNextHandler = () => nextHandler(INFO_MAP_SCREEN)
     const mapNextHandler = () => { 
         if(marker.current && marker.current.getPosition()) { nextHandler(INFO_PHOTO_SCREEN) }
@@ -77,32 +66,31 @@ function InfoPage() {
 
 
     const infoHandler = async () => { 
-        const query = `/api/user/set-info-${type.toLowerCase()}`
-        const position = marker.current? marker.current.getPosition() : null
+        let initial = initialClient
 
         const form = new FormData()
 
         form.append('name', name.value)
         form.append('phone', phone.value)
-        form.append('whatsapp', whatsapp.value)
-        form.append('facebook', facebook.value)
-        form.append('instagram', instagram.value)
-        form.append('telegram', telegram.value)
+        form.append('whatsapp', contact.values.whatsapp)
+        form.append('facebook', contact.values.facebook)
+        form.append('instagram', contact.values.instagram)
+        form.append('telegram', contact.values.telegram)        
 
         if(type === 'MASTER') {
+            const position = marker.current? marker.current.getPosition() : null
+
             images.list.forEach((item) => form.append('images', item.file))           
             select.cases.forEach((item) => form.append('cases', item))
             form.append('lat', position? position.lat() : null)
             form.append('lng', position? position.lng() : null)
-        }
 
-        try { 
-            const { edit } = await request(query, 'POST', form, {Authorization: `Bearer ${token}`}, 'form') 
-            if(edit) { inform(); navigate("/profile") }
+            initial = initialMaster
         }
-        catch(e) { 
-            if(e.message === 'Not Authorization') { logout() }
-            console.log(e.message)
+        
+        if(await initial(form)) { 
+            refreshUser()
+            navigate("/profile") 
         }
     }
 
@@ -111,7 +99,8 @@ function InfoPage() {
 
         {currentPage === INFO_PHONE_SCREEN && <>
             <div className='title'>Ваше телефон</div>
-            <input className='input' placeholder='ввести' {...phone.bind} />
+            <Input input={phone.bind} label='Телефон' ></Input>
+            <br />
             <button className='btn btn-lg' disabled={!phone.value} onClick={ phoneNextHandler }>Далі</button>
         </>}
         {currentPage === INFO_TYPE_SCREEN && <>
@@ -121,23 +110,20 @@ function InfoPage() {
         </>}        
         {currentPage === INFO_NAME_SCREEN && <>
             <div className='title'>Ваше ім’я</div>
-            <input className='input' placeholder='ввести' {...name.bind} />
+            <Input input={name.bind} label="Имя"></Input>
+            <br />
             <button className='btn btn-lg' disabled={!name.value} onClick={ nameNextHandler }>Далі</button>
         </>}
         {currentPage === INFO_CONTACT_SCREEN && <>
             <div className='title'>Оберіть і додайте зручний для вас мессенджери</div>
-            <div className='contacts'>
-                <Contact social={SOCIAL.facebook} input={facebook} ></Contact>
-                <Contact social={SOCIAL.whatsapp} input={whatsapp} ></Contact>
-                <Contact social={SOCIAL.instagram} input={instagram} ></Contact>                
-                <Contact social={SOCIAL.telegram} input={telegram} ></Contact>
-            </div>
+            <Contacts {...contact.bind} ></Contacts>
             <button className='btn btn-lg' onClick={() => infoHandler()}>Завершити реєстрацію</button>
         </>}
 
         {currentPage === INFO_TITLE_SCREEN && <>
             <div className='title'>Назва вашої компанії (якщо немає, то ваше ім’я та прізвище)</div>
-            <input className='input' placeholder='ввести' {...name.bind} />
+            <Input input={name.bind} label='Компания' ></Input>
+            <br />
             <button className='btn btn-lg' disabled={!name.value} onClick={ titleNextHandler }>Далі</button>
         </>} 
         {currentPage === INFO_CAT_SCREEN && <>
@@ -163,8 +149,6 @@ function InfoPage() {
                 <FontAwesomeIcon icon={faArrowLeftLong} />
             </button>
         </>}
-
-        {/* <button onClick={load}>test</button> */}
 
         </div>
     );

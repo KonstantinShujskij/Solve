@@ -1,6 +1,5 @@
 const {Router} = require('express')
 const {check, validationResult} = require('express-validator')
-const jwt = require('jsonwebtoken')
 const config = require('config')
 const auth = require('../middleware/auth.middleware')
 const file = require('../middleware/file.middleware')
@@ -70,5 +69,38 @@ router.post('/set-info-master',
         res.status(500).json({ message: 'Что-то пошло не так...'})
     }
 })
+
+router.post('/get', auth, async (req, res) => {
+    try {
+        const user = await userQueries.get(req.user.userId)
+        if(!user) { return res.status(400).json({ message: "User not find" }) }
+
+        res.status(200).json(user)
+
+    } catch(error) {
+        res.status(500).json({ message: 'Что-то пошло не так...'})
+    }
+})
+
+router.post('/set-contacts', 
+    [
+        check('whatsapp', 'Incorect whatchapp').optional({checkFalsy: true}).isMobilePhone()
+    ], 
+    auth, 
+    async (req, res) => {
+    try {
+        const {telegram, instagram, facebook, whatsapp} = req.body
+
+        const error = await userQueries.setInfo(req.user.userId, { telegram, instagram, facebook, whatsapp })
+
+        if(error) { return res.status(400).json({ message: "Incorect data" }) }
+
+        res.status(200).json({ edit: true })
+    } catch(error) {
+        res.status(500).json({ message: 'Что-то пошло не так...'})
+    }
+})
+
+
 
 module.exports = router;

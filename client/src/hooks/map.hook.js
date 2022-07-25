@@ -14,6 +14,9 @@ export default function useMap() {
             map.current = new google.maps.Map(elem, {
                 center: {lat: 47.82545, lng:  35.16247},
                 zoom: 17,
+                mapTypeControl: false,
+                zoomControl: false,
+                streetViewControl: false,
                 styles: MAP_STYLE
             })
 

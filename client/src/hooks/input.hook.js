@@ -1,7 +1,8 @@
 import { useState } from "react"
 
+const nopeTrue = () => true
 
-export default function useValidationInput(defaultValue, validation) {
+export default function useValidationInput(defaultValue, validation=nopeTrue) {
     const [value, setValue] = useState(defaultValue)
 
     const onChange = (event) => { 

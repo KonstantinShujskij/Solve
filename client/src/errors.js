@@ -1,0 +1,1 @@
+export const BAD_AUTH = 'Not Authorization'

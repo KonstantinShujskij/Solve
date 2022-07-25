@@ -3,25 +3,21 @@ const bcrypt = require('bcrypt');
 
 
 module.exports = {
-    login: async (email, password, service = 'defaul') => {
-        const user = await User.findOne({ email });
-        if(!user) { return { user, error: 'User not find' } }
+    login: async (email, password, service = 'default') => {
+        const user = await User.findOne({ email })
+
+        if(!user) { 
+            const hashedPassword = service === 'default'? await bcrypt.hash(password, 12) : 'None'
+            const user = new User({ email, password: hashedPassword })
+            await user.save()
+    
+            return { user, error: null }
+        }
 
         if(service === 'google') { return { user, error: null } }
 
         const isMatch = await bcrypt.compare(password, user.password);
         if(!isMatch) { return { user, error: 'Incorect password' } }
-
-        return { user, error: null }
-    },
-    register: async (email, password, service = 'default') => {
-        const candidate = await User.findOne({ email })
-        if(candidate) { return { user: null, error: 'This user is exist' } }
-
-        const hashedPassword = service === 'default'? await bcrypt.hash(password, 12) : 'None'
-
-        const user = new User({ email, password: hashedPassword })
-        await user.save()
 
         return { user, error: null }
     },
@@ -34,6 +30,6 @@ module.exports = {
     },
     get: async (id) => {
         try { return await User.findOne({ _id: id }) } 
-        catch(error) { return null }        
+        catch(error) { console.log(error); return null }        
     },
 }

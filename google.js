@@ -15,11 +15,6 @@ const googleStrategy = new passportGoogle.OAuth2Strategy(googleOptions,
         const email = profile._json.email
 
         let {user, error} = await userQueries.login(email, null, 'google')
-        if(error) { 
-            const answer = await userQueries.register(email, null, 'google')
-            user = answer.user
-            error = answer.error
-        }
 
         return done(error, user)
 })

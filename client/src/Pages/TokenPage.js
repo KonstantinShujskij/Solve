@@ -9,8 +9,8 @@ function TokenPage() {
     useEffect(() => {
         const token = searchParams.get('token')
         const id = searchParams.get('id')
-        const isCompletely = searchParams.get('isCompletely') === 'true'? true : false
-        window.opener.authenticateCallback(token, id, isCompletely);
+
+        window.opener.authenticateCallback(token, id);
         window.close();
     }, [searchParams])
 
