@@ -1,5 +1,6 @@
 {
-    "port": 5000,
+    "port": 80,
+    "baseUrl": "http://whatyoydoing.site",
     "jwtSecret": "NHrmJipPAavz6Juw",
     "mongoUri": "mongodb+srv://root:EFzszXjdI9k0whE5@cluster0.ashvdhv.mongodb.net/?retryWrites=true&w=majority",
     "googleClientId": "250552136806-j1hcq7dotmuus6ue5nf4u79s5rlvl9i5.apps.googleusercontent.com",
