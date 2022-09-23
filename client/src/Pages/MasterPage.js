@@ -1,84 +1,51 @@
-import React, { useEffect, useState } from 'react'
-import { useSelector } from "react-redux"
+import React from 'react'
+//import { useSelector } from "react-redux"
 
-import useAuth from '../hooks/auth.hook';
-import { useNavigate } from "react-router-dom";
-import useApi from '../hooks/api.hook';
-import * as selectors from '../selectors'
-import Lot from '../components/Lot'
-import useValidationInput from '../hooks/input.hook'
+import { Outlet } from "react-router-dom";
+import { FRONT_URL } from '../const';
+//import useApi from '../hooks/api.hook';
+//import * as selectors from '../selectors'
+//import Lot from '../components/Lot'
+//import useUnmount from '../hooks/unmount.hook';
+import MenuSection from '../sections/MenuSections'
 
 
 function MasterPage() {
-    const navigate = useNavigate()
-    const { logout } = useAuth()
-    const { loadLots, loadOrders, acceptContract, getContract } = useApi()
+    //const user = useSelector(selectors.user)
 
-    const user = useSelector(selectors.user)
+    //const [myDevice, setMyDevice] = useState([])
+    //const [isOpen, setIsOpen] = useState(false)
+    //const [contract, setContract] = useState({})
 
-    const [list, setList] = useState([])
-    const [myDevice, setMyDevice] = useState([])
-    const [isOpen, setIsOpen] = useState(false)
-    const [contract, setContract] = useState({})
+    //const contractData = useValidationInput('', () => true)
 
-    const contractData = useValidationInput('', () => true)
+    // const acceptHandler = (id) => {
+    //     acceptContract({ id, data: contractData.value }).then(() => {
+    //         setIsOpen(false)
+    //     })
+    // }
 
-
-    useEffect(() => {
-        loadLots().then((lots) => setList(lots))
-        loadOrders().then((orders) => setMyDevice(orders))
-    }, [])
-
-    const acceptHandler = (id) => {
-        acceptContract({ id, data: contractData.value }).then(() => {
-            setIsOpen(false)
-        })
-    }
-
-    const showContract = (id) => {
-        getContract({id}).then((data) => { 
-            setContract(data) 
-        })
+    // const showContract = (id) => {
+    //     getContract({id}).then((data) => { 
+    //         setContract(data) 
+    //     })
         
-        setIsOpen(true)
-    }
+    //     setIsOpen(true)
+    // }
 
     return (
-        <div className="token">
-            <div className='top'>
-                <div>MasterPage</div>
-                <div className='top__name'>{(user? user.name : 'unknow')}</div>
-            </div>
-            
-            <div className='client-main'>
-                { list.map((device) => <Lot device={device} key={device._id}></Lot>) }
-                {!list.length && <div> not have lots </div>}
+        <div className='container master'>
+            <div className='content'>
+                <div className='avatar small-avatar'>
+                    <img className='avatar__image' src={`${FRONT_URL}/images/avatar.png`} alt="avatar" />
+                </div>
             </div>
 
-            <div className='client-main'>
-                { myDevice.map((device) => <div key={device._id}>
-                    <div>{device.model}</div>
-                    <div>{device.category}</div>
+            <Outlet />
 
-                    {(device.status === 'RESERVE' && <>
-                        <div>Ваша ставка была выбрана</div>
-                        <button className="btn" onClick={() => showContract(device.contract)}>Подписать Контракт</button>
-                    </>)}
-                    
-                    <div className={`device__popup ${isOpen?"device__popup_open":""}`}>
-                        <div>{contract.data}</div>
-                        <input {...contractData.bind} />
-                        <button onClick={() => acceptHandler(device._id)}> accept </button>
-
-                        <button onClick={() => { setIsOpen(false) }}>close</button>
-                    </div>
-                </div>) }
-                {!myDevice.length && <div> not have lots </div>} 
-            </div>
-
-            <button onClick={() => { navigate('/'); logout() }}>Log Out</button>
+            <MenuSection />
         </div>
-    );
+    )
 }
 
-export default MasterPage;
+export default MasterPage

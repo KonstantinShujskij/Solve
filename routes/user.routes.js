@@ -23,9 +23,9 @@ router.post('/set-info-client',
             return res.status(400).json({ errors: errors.array(), message: "Incorect data" })
         }
 
-        const { name, telegram, instagram, facebook, whatsapp } = req.body
+        const { name, phone, telegram, instagram, facebook, whatsapp } = req.body
 
-        const error = await userQueries.setInfo(req.user.userId, { name, telegram, instagram, 
+        const error = await userQueries.setInfo(req.user.userId, { name, phone, telegram, instagram, 
             facebook, whatsapp, type: 'CLIENT' })
 
         if(error) { return res.status(400).json({ message: "Incorect data" }) }
@@ -55,11 +55,11 @@ router.post('/set-info-master',
             return res.status(400).json({ errors: errors.array(), message: "Incorect data" })
         }
 
-        const {name, cases, lat, lng, telegram, instagram, facebook, whatsapp} = req.body
+        const {name, cases, lat, lng, phone, telegram, instagram, facebook, whatsapp} = req.body
         const images = req.files.map((file) => file.filename)
 
-        const error = await userQueries.setInfo(req.user.userId, { name, cases, lat, lng, telegram, 
-            instagram, facebook, whatsapp, images, type: 'MASTER' })
+        const error = await userQueries.setInfo(req.user.userId, { name, cases, lat, lng, phone, 
+            telegram, instagram, facebook, whatsapp, images, type: 'MASTER' })
 
         if(error) { return res.status(400).json({ message: "Incorect data" }) }
 
@@ -77,6 +77,19 @@ router.post('/get', auth, async (req, res) => {
 
         res.status(200).json(user)
 
+    } catch(error) {
+        res.status(500).json({ message: 'Что-то пошло не так...'})
+    }
+})
+
+router.post('/info', async (req, res) => {
+    try {
+        const { id } = req.body
+
+        const user = await userQueries.get(id)
+        if(!user) { return res.status(400).json({ message: "User not find" }) }
+
+        res.status(200).json({ name: user.name, phone: user.phone, _id: user._id })
     } catch(error) {
         res.status(500).json({ message: 'Что-то пошло не так...'})
     }

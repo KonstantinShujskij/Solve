@@ -7,6 +7,7 @@ const schema = new Schema({
     images: [ {type: String} ],
     status: {type: String},
     owner: {type: Types.ObjectId, ref: 'User'},
+    time: {type: Number, default: Date.now()},
 
     bets: [ {type: Types.ObjectId, ref: 'Bet'} ],
     bet: {type: Types.ObjectId, ref: 'Bet'},

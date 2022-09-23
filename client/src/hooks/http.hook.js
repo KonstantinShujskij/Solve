@@ -1,4 +1,5 @@
 import { useCallback, useState } from "react"
+import { FRONT_URL } from "../const";
 
 export default function useHttp() {
     const [loading, setLoading] = useState(false)
@@ -13,7 +14,7 @@ export default function useHttp() {
                 headers['Content-Type'] = 'application/json'
             }
 
-            const response = await fetch(url, {method, body, headers})
+            const response = await fetch(`${FRONT_URL}/${url}`, {method, body, headers})
             const data = await response.json()
 
             if(!response.ok) { throw new Error(data.message || "Opss...") }

@@ -63,7 +63,7 @@ router.post('/lots', auth, async (req, res) => {
 
 router.post('/set-bet', auth, async (req, res) => {
     try {
-        const { id, data } = req.body
+        const { id, price, description } = req.body
 
         const user = await userQueries.get(req.user.userId)
         if(!user) { return res.status(400).json({ message: "User not find" }) }
@@ -71,7 +71,8 @@ router.post('/set-bet', auth, async (req, res) => {
         const device = await deviceQueries.get(id)
         if(!device) { return res.status(400).json({ message: "Device not find" }) }
 
-        const bet = new Bet({ data, ownerName: user.name, owner: req.user.userId, device: device._id })
+        const bet = new Bet({ price, description, ownerName: user.name, 
+            owner: req.user.userId, device: device._id })
         await bet.save()
 
         device.bets.push(bet._id)
@@ -86,11 +87,22 @@ router.post('/set-bet', auth, async (req, res) => {
 router.post('/get-bets', auth, async (req, res) => {
     try {
         const { ids } = req.body
-        console.log(ids)
 
         const bets = await Bet.find({ _id: {$in: ids} })
 
         res.status(200).json(bets)
+    } catch(error) {
+        res.status(500).json({ message: 'Что-то пошло не так...'})
+    }
+})
+
+router.post('/get-bet', auth, async (req, res) => {
+    try {
+        const { id } = req.body
+
+        const bet = await Bet.findOne({ _id: id })
+
+        res.status(200).json(bet)
     } catch(error) {
         res.status(500).json({ message: 'Что-то пошло не так...'})
     }
@@ -224,6 +236,43 @@ router.post('/orders', auth, async (req, res) => {
         res.status(500).json({ message: 'Что-то пошло не так...'})
     }
 })
+
+router.post('/load', auth, async (req, res) => {
+    try {
+        const { id } = req.body
+        
+        const device = await deviceQueries.get(id)
+
+        res.status(200).json(device)
+    } catch(error) {
+        res.status(500).json({ message: 'Что-то пошло не так...'})
+    }
+})
+
+
+router.post('/accept', auth, async (req, res) => {
+    try {
+        const { id } = req.body
+
+        const device =  await deviceQueries.get(id)
+        if(!device) { return res.status(400).json({ message: "Device not find" }) }
+
+        if(device.status !== constants.status.PACT) { 
+            return res.status(400).json({ message: "Device not pact" }) 
+        }
+
+        if(req.user.userId == device.owner) { device.status = constants.status.CONFIRM }
+        else { return res.status(400).json({ message: "You not owner" })  }
+
+        await device.save()
+        
+        res.status(200).json()
+    } catch(error) {
+        res.status(500).json({ message: 'Что-то пошло не так...'})
+    }
+})
+
+
 
 
 module.exports = router;

@@ -1,21 +1,22 @@
 .input {
-    position: relative;
+    display: flex;
+    align-items: center;
     width: 100%;
 
-    border-bottom: 1px solid #94a1b2;
-    border-radius: 0;
-    color: #090909;
-    font-size: 18px;
-    letter-spacing: normal;
-    color: #fffffe;
+    background: #EFEFEF;
+    border: 1px solid #DEDEDE;
+    border-radius: 10px;
+    padding: 0 8px;
+
+    color: #737373;
 }
 
 .input_focus {
-    border-color: #ff8906;
+    border-color: #3DA9FC;
 }
 
 .input_fill {
-    border-color: #ff8906;
+    border-color: #3DA9FC;
 }
 
 .input__value {
@@ -23,29 +24,25 @@
     width: 100%;
     border: none;
     background-color: transparent;
-    padding: 24px 12px 8px 12px;
+    padding: 8px 0;
     font-size: inherit;
     letter-spacing: inherit;
 }
 
-.input__placeholder {
-    color: inherit;
-    position: absolute;
-    left: 12px;
-    top: 16px;
-    font-size: inherit;
-    line-height: 1;
-    letter-spacing: inherit;
-    transition: all ease 0.4s;
-    color: #94a1b2;
+.input__icon {
+    height: 100%;
+    width: 20px;
+    margin-right: 10px;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.input__placeholder_focus {
-    font-size: 14px;
-    transform: translateY(-8px);
+.input__placeholder_focus path{
+    fill: #3DA9FC;
 }
 
-.input__placeholder_fill {
-    font-size: 14px;
-    transform: translateY(-8px);
+.input__placeholder_fill path{
+    fill: #3DA9FC;
 }

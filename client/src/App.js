@@ -1,8 +1,7 @@
 import React from 'react'
-import {useRoutes} from "./routes";
-import { useSelector } from "react-redux";
+import { useSelector } from "react-redux"
+import {useRoutes} from "./routes"
 import * as selectors from './selectors'
-
 
 
 function App() {
@@ -15,10 +14,10 @@ function App() {
   const routes = useRoutes(isAuthenticated, isCompletely, userType)
   
   return (
-    <div className="container">
+    <div>
       {routes}
     </div>
-  );
+  )
 }
 
-export default App;
+export default App

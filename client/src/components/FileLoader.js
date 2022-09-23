@@ -1,5 +1,6 @@
 import React from "react"
-import { MAX_IMAGES } from "../const"
+import { ICONS } from "../const"
+import '../styles/fileloader.css'
 
 export default function FileLoader({input, list, setList, options}) {
 
@@ -19,7 +20,7 @@ export default function FileLoader({input, list, setList, options}) {
                 const time = Date.now()
 
                 setList((prevent) => {
-                    if(prevent.length >= MAX_IMAGES) { return [...prevent] }
+                    if(prevent.length >= options.count) { return [...prevent] }
                     return [...prevent, {img: ev.target.result, file: file, id: time + file.name}]
                 })
             }
@@ -34,17 +35,23 @@ export default function FileLoader({input, list, setList, options}) {
     }
 
     return (
-        <div className="select">
-            <button className="btn btn-lg" onClick={triggerHandler}>Додати</button>
+        <div className="loader">
             <input ref={input} onChange={changeHandler} type="file" multiple={options.multi}
                    accept={Array.isArray(options.accept) ? options.accept.join(',') : null} />
-            <div className="preview">
-                {list.map((item) => (
-                    <div className="image" key={item.id} onClick={() => removeItem(item.id)}>
-                        <img src={item.img} alt={item.file.name} />
+
+            <button className="loader__item loader__button icon" onClick={triggerHandler}>
+                {ICONS.plus}
+            </button>
+            
+            {list.map((item) => (
+                <div className="loader__item loader__image" key={item.id}>
+                    <img src={item.img} alt={item.file.name} />
+
+                    <div className="icon loader-item__dismis" onClick={() => removeItem(item.id)}>
+                        {ICONS.close}
                     </div>
-                ))}
-            </div>            
+                </div>
+            ))}
         </div>
     )
 }

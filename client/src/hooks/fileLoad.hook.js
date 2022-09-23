@@ -1,6 +1,6 @@
 import { useRef, useState } from "react"
 
-const initialOptions = { multi: false, accept: []  }
+const initialOptions = { multi: false, count: 1, accept: []  }
 
 export default function useFileLoad(options=initialOptions) {
     const input = useRef()

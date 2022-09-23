@@ -1,0 +1,8 @@
+.welcome__seal {
+    transform: translateX(-11px);
+    margin-bottom: 42px;
+}
+
+.welcome__title {
+    margin-bottom: 16px;
+}

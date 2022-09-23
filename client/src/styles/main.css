@@ -1,0 +1,424 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap');
+
+@font-face {
+    font-family: 'fontello';
+    src: url('../fonts/fontello.ttf?75005896') format('truetype');
+
+    font-weight: normal;
+    font-style: normal;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    outline: none;
+    border: none;
+    font-style: normal;
+}
+
+::-webkit-scrollbar {
+    width: 0;
+}
+
+input[type='file'] {
+    display: none;
+}
+
+body {
+    background-color: #F1F3F6;
+    font-family: 'Roboto', sans-serif;
+}
+
+.container {
+    padding: 48px 16px;
+    width: 100vw;
+    height: 100vh;
+    max-height: 100vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.icon {
+    font-family: "fontello";
+    font-style: normal;
+    font-weight: normal;
+}
+
+.logo {
+    width: 156px;
+    position: relative;
+}
+
+.logo::before {
+    display: block;
+    content: '';
+    width: 100%;
+    height: 0;
+    padding-top: 26.9%;
+}
+
+.logo__image {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    object-fit: cover;
+}
+
+
+.seal {
+    width: 210px;
+    position: relative;
+}
+
+.seal::before {
+    display: block;
+    content: '';
+    width: 100%;
+    height: 0;
+    padding-top: 90.5%;
+}
+
+.seal__image {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    object-fit: cover;
+}
+
+.top-back {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 16px;
+}
+
+.top-back__button {
+    color: #094067;
+    margin-right: auto;
+}
+
+.top-back__logo {
+    margin-right: auto;
+}
+
+.card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    background: #F7F8FA;
+    border: 1px solid #FFFFFF;
+    box-shadow: 4px 4px 17px rgba(0, 0, 0, 0.1), -4px -4px 17px #FFFFFF;
+    border-radius: 20px;
+    padding: 20px 16px;
+}
+
+.card__logo {
+    margin-bottom: 10px;
+}
+
+.card__title {
+    text-align: center;
+    margin-bottom: 4px;
+}
+
+.card__text {
+    text-align: center;
+}
+
+.card__button {
+    margin-top: 16px;
+}
+
+.card__subtext {
+    margin-top: 16px;
+}
+
+.card__space {
+    width: 100%;
+    height: 16px;
+}
+
+
+.card__hr {
+    width: calc(100% + 32px);
+    margin: 0 -16px;
+    background-color:#D1D1D1;
+    height: 1px;
+}
+
+.popup {
+    display: none;
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    background-color: #F1F3F6;
+}
+
+.popup_open {
+    display: flex;
+}
+
+.separator {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 24px 16px 20px 16px;
+}
+
+.separator__hr {
+    height: 1px;
+    width: 100%;
+    background-color: #5F6C7B;
+}
+
+.separator__text {
+    padding: 0 8px;
+}
+
+.content {
+    width: 100%;
+    padding: 24px 16px;
+}
+
+.content__title {
+    margin-bottom: 8px;
+}
+
+.button-wrap {
+    width: 100%;
+    padding: 16px;
+}
+
+.button {
+    display: block;
+    background: #3DA9FC;
+    border-radius: 10px;
+    padding: 8px 16px;
+    text-decoration: none;
+    text-align: center;
+
+    font-weight: 500;
+    font-size: 16px;
+    line-height: 19px;
+    color: #FFFFFF;
+}
+
+.button-grey {
+    background: #F7F8FA;
+    border: 1px solid #5F6C7B;
+    color: #5F6C7B;
+}
+
+.title {
+    font-weight: 500;
+    font-size: 24px;
+    line-height: 28px;
+    color: #094067;
+}
+
+.subtitle {
+    font-weight: 500;
+    font-size: 18px;
+    line-height: 21px;
+
+    color: #094067;
+    text-decoration: none;
+}
+
+.text {
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 19px;
+    color: #5F6C7B;
+}
+
+.subtext {
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 16px;
+    color: #5F6C7B;
+}
+
+.link {
+    font-weight: 500;
+    cursor: pointer;
+    color: #3DA9FC;
+}
+
+
+.social {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.social__item {
+    margin: 0 8px;
+    width: 42px;
+    height: 42px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #FFF;
+    font-size: 26px;
+}
+
+.bets-list {
+    width: 100%;
+}
+
+.social__facebook { background-color: #5177B9; }
+.social__twiter { background-color: #3FD3F7; }
+.social__google { background-color: #FF6658; }
+.social__phone { background-color: #737373; }
+
+.social__img {
+    display: block;
+    height: 28px;
+}
+
+.red { background-color: #EF4565; }
+.w-100 { width: 100%; }
+.d-flex { display: flex; }
+.text-center { text-align: center; }
+.mt-auto { margin-top: auto; }
+.mb-auto { margin-bottom: auto; }
+.mr-auto { margin-right: auto; }
+.ml-auto { margin-left: auto; }
+.flex-jc { justify-content: center; }
+
+.client, .master {
+    padding-bottom: 0;
+    padding-top: 8px;
+}
+
+.menu {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+
+    width: calc(100% + 32px);
+    margin-left: -16px;
+    margin-right: -16px;
+    flex-shrink: 0;
+    height: 86px;
+    background-color: #FFFFFF;
+}
+
+.menu__item {
+    font-family: 'Roboto';
+    font-style: normal;
+    font-weight: 500;
+    font-size: 14px;
+    line-height: 16px;
+    text-align: center;
+
+    color: #094067;
+
+    padding: 16px 8px;
+    text-decoration: none;
+}
+
+.menu__icon {
+    height: 36px;
+    margin-bottom: 8px;
+}
+
+.menu__icon div, .menu__icon svg {
+    height: 100%;
+}
+
+.menu__item path {
+    fill: transparent;
+    stroke: #094067;
+}
+
+.menu__item.active path {
+    fill: #094067;
+}
+
+.devices {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.header {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;   
+    padding: 24px 16px; 
+    padding-top: 0;
+}
+
+.back-btn, .back-button {
+    margin-right: auto;
+    font-size: 22px;
+    color: #094067;
+}
+
+.textarea {
+    height: 84px;
+    padding: 8px;
+    font-size: 16px;
+}
+
+.lot__img {
+    width: 300px;
+    height: 150px;
+    position: relative;
+    overflow: hidden;
+}
+
+.lot__img img {
+    width: 100%;
+    height: 100%;
+
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+
+    object-fit: cover;
+}
+
+.lot__time {
+    font-size: 14px;
+    margin-bottom: 8px;
+    margin-top: 2px;
+}
+
+.list {
+    width: 100%;
+    overflow-y: auto;
+    padding-bottom: 16px;
+}
+
+.device-page {
+    justify-content: flex-start;
+}
+
+.settings {
+    padding-top: 48px;
+    padding-bottom: 0;
+}
+  

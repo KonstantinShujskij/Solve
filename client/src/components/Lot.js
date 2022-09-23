@@ -1,33 +1,42 @@
 import React from "react"
-import useApi from "../hooks/api.hook"
-import useValidationInput from '../hooks/input.hook'
+import { Link } from "react-router-dom"
+import { ICONS } from "../const"
+
+function timeToDate(time) {
+    const date = new Date(time)
+    return date.toLocaleDateString() + " " + date.toLocaleTimeString().substring(0, 5)
+}
 
 
-export default function Device({device}) {
-    const betData = useValidationInput('', () => true)
-    const { setBet } = useApi()
-
-    const setBetHandler = async (id) => {
-        console.log('set bet');
-        await setBet({ id, data: betData.value })
-    }
+export default function Lot({device}) {
 
     return (
-        <div className="device">
-            <div className="device__title">Категория: {device.category}</div>
-            <div className="device__title">Модель: {device.model}</div>
-
-            <div className="image">
-                {(device.images.length && 
-                    <img src={`http://localhost:5000/store/images/${device.images[0]}`} alt="" />
-                )}                
+        <div className="card device">
+            <div className="device__row device__label">
+                <div className="device__icon icon" style={{color: "#5F6C7B"}}>{ICONS.circle}</div>
+                <div className="device__text">
+                    <p>Категорія: {device.category}</p>
+                </div>
             </div>
-            <div className="device__description">
-                {device.description}
+            <div className="w-100 text lot__time">{timeToDate(device.time)}</div>
+            <div className="device__row">
+                <div className="device__icon icon">{ICONS.model}</div>
+                <Link className="device__title" to={`/device/${device._id}`}>{device.model}</Link>
             </div>
-            <div>
-                <input {...betData.bind} />
-                <button onClick={() => setBetHandler(device._id)}>Set Bet</button>
+            <div className="card__hr"></div>
+            <div className="device__row">
+                <div className="device__icon icon">{ICONS.circle}</div>
+                <div className="device__text">
+                    <p>{device.description}</p>
+                </div>
+            </div>
+            <div className="card__hr"></div>
+            <div className="device__row">
+                <div className="device__icon icon">{ICONS.circle}</div>
+                <div className="device__text">
+                    <p>Ставок:</p>
+                    <p>{device.bets.length}</p>
+                </div>
             </div>
         </div>
     )

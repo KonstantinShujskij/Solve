@@ -1,37 +1,85 @@
+
+.card.device {
+  padding-top: 4px;
+  padding-bottom: 8px;
+}
+
 .device {
-    width: 100%;
-    padding: 16px 24px;
-    margin-bottom: 16px;
-    border-radius: 8px;
-    background-color: #242629;
+  margin-bottom: 16px;
+}
+
+.device__row {
+  padding: 10px 0;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+  width: 100%;
+  min-height: 58px;
+}
+
+.device__label {
+  min-height: fit-content;
+  align-items: center;
+}
+
+.device__icon {
+  flex-shrink: 0;
+  width: 24px;
+  text-align: left;
+  margin-right: 10px;
+  font-size: 16px;
+  color: #094067;
+  margin-top: 5px;
+}
+
+.device__label .device__icon{
+  margin-top: 0;
 }
 
 .device__title {
-    font-size: 18px;
-    color: #ff8906;
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 500;
+  font-size: 20px;
+  line-height: 23px;
+  text-decoration: none;
+  display: block;
+
+  color: #094067;
 }
 
-.device__popup {
-    width: 100%;
-    height: 100%;
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: 0;
-    bottom: 0;
-    background-color: #0f0e17;
-    padding: 8px 24px;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    display: none;
-  }
-  
-  .device__popup_open {
-    display: flex;
-  }
+.device__text {
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 19px;
 
+  color: #5F6C7B;
+}
 
-  .bet {
-    width: 100%;
-  }
+.device__link {
+  font-weight: 500;
+  color: #094067;
+}
+
+.device__image {
+  width: 100%;
+  height: 0;
+  padding-top: 53.7%;
+  position: relative;
+  border: 1px solid #FFFFFF;
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.device__image img {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  top: 0;
+  object-fit: cover;
+}

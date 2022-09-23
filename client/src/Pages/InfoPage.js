@@ -1,29 +1,41 @@
 import React, { useState } from 'react'
-import Select from '../components/Select'
-import { INFO_CAT_SCREEN, INFO_CONTACT_SCREEN, INFO_MAP_SCREEN, INFO_NAME_SCREEN, INFO_PHONE_SCREEN, 
-         INFO_PHOTO_SCREEN, INFO_TITLE_SCREEN, INFO_TYPE_SCREEN } from '../const'
+import { useSelector } from 'react-redux'
+import { useNavigate } from "react-router-dom";
+
+import { INFO_CAT_SCREEN, INFO_CONTACT_SCREEN, INFO_MAP_SCREEN, INFO_NAME_SCREEN, 
+         INFO_PHONE_SCREEN, INFO_PHOTO_SCREEN, INFO_TITLE_SCREEN, INFO_TYPE_SCREEN } from '../const'
+
+import useApi from '../hooks/api.hook'
+import useAuth from '../hooks/auth.hook'
+import useUser from '../hooks/user.hook'
+
+import useContacts from "../hooks/contacts.hook"
+import useFileLoad from '../hooks/fileLoad.hook'
 import useMap from '../hooks/map.hook'
 import useSelect from '../hooks/select.hook'
 import useValidationInput from '../hooks/input.hook'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faArrowLeftLong } from '@fortawesome/free-solid-svg-icons'
-import { useNavigate } from "react-router-dom";
-import FileLoader from '../components/FileLoader'
-import useFileLoad from '../hooks/fileLoad.hook'
-import useUser from '../hooks/user.hook'
-import useContacts from "../hooks/contacts.hook"
-import Contacts from '../components/Contacts'
-import useApi from '../hooks/api.hook'
-import { useSelector } from 'react-redux'
-import * as selectors from '../selectors'
-import Input from '../components/base/Input'
 
+import * as selectors from '../selectors'
+
+import BackSection from '../sections/BackSection'
+
+import InfoPhoneSection from '../sections/InfoPhoneSection'
+import InfoTypeSection from '../sections/InfoTypeSection'
+import InfoNameSection from '../sections/InfoNameSection'
+import InfoContactSection from '../sections/infoContactSection'
+import InfoTitleSection from '../sections/InfoTitleSection'
+import InfoCatSection from '../sections/InfoCatSection'
+import InfoMapSection from '../sections/InfoMapSection'
+
+import '../styles/infoPage.css'
+import InfoPhotoSection from '../sections/InfoPhotoSection';
 
 
 function InfoPage() {
     const navigate = useNavigate()
     const { initialMaster, initialClient } = useApi()
     const { refreshUser } = useUser()
+    const { logout } = useAuth()
 
     const categories = useSelector(selectors.categories)
 
@@ -33,7 +45,7 @@ function InfoPage() {
     const select = useSelect(categories)
     const { elem, marker } = useMap() 
     const contact = useContacts() 
-    const images = useFileLoad({ multi: true, accept: ['.png', '.jpg', '.jpeg'] })
+    const images = useFileLoad({ multi: true, count: 5, accept: ['.png', '.jpg', '.jpeg'] })
 
     const [currentPage, setCurrentPage] = useState(INFO_PHONE_SCREEN)
     const [stack, setStack] = useState([])
@@ -48,22 +60,12 @@ function InfoPage() {
     const backHandler = () => {
         const temp = [...stack]
         const page = temp.pop()
-        setStack(temp)
-        setCurrentPage(page)
+        if(page) {
+            setStack(temp)
+            setCurrentPage(page)
+        }
+        else { logout() }        
     }
-
-    const phoneNextHandler = () => nextHandler(INFO_TYPE_SCREEN)
-    const typeMasterNextHandler = () => { nextHandler(INFO_TITLE_SCREEN); setType('MASTER') } 
-    const typeClientNextHandler = () => { nextHandler(INFO_NAME_SCREEN); setType('CLIENT') }
-    const nameNextHandler = () => nextHandler(INFO_CONTACT_SCREEN)
-    const titleNextHandler = () => { nextHandler(INFO_CAT_SCREEN) }
-    const catNextHandler = () => nextHandler(INFO_MAP_SCREEN)
-    const mapNextHandler = () => { 
-        if(marker.current && marker.current.getPosition()) { nextHandler(INFO_PHOTO_SCREEN) }
-        else { console.log("местоположение не выбранно"); }
-    }
-    const photoNextHandler = () => nextHandler(INFO_CONTACT_SCREEN)
-
 
     const infoHandler = async () => { 
         let initial = initialClient
@@ -94,64 +96,36 @@ function InfoPage() {
         }
     }
 
+    const currentSection = (screen) => {
+        switch(screen) {
+            case INFO_PHONE_SCREEN:
+                return <InfoPhoneSection {...{phone}} callback={() => nextHandler(INFO_TYPE_SCREEN)} /> 
+            case INFO_TYPE_SCREEN:
+                return (<InfoTypeSection {...{setType}} clientCallback={() => nextHandler(INFO_NAME_SCREEN)} 
+                        masterCallback={() => nextHandler(INFO_TITLE_SCREEN)} />)
+            case INFO_NAME_SCREEN:
+                return <InfoNameSection {...{name}} callback={() => nextHandler(INFO_CONTACT_SCREEN)} />
+            case INFO_CONTACT_SCREEN:
+                return <InfoContactSection {...{contact}} callback={infoHandler} />
+            case INFO_TITLE_SCREEN:
+                return <InfoTitleSection {...{name}} callback={() => nextHandler(INFO_CAT_SCREEN)} />
+            case INFO_CAT_SCREEN:
+                return <InfoCatSection {...{select}} callback={() => nextHandler(INFO_MAP_SCREEN)} />
+            case INFO_MAP_SCREEN:
+                return <InfoMapSection {...{elem, marker}} callback={() =>nextHandler(INFO_PHOTO_SCREEN)} />
+            case INFO_PHOTO_SCREEN:
+                return <InfoPhotoSection {...{images}} callback={() => nextHandler(INFO_CONTACT_SCREEN)} />
+            default:
+                return <></>
+        }
+    }
+
     return (
-        <div className="auth">
-
-        {currentPage === INFO_PHONE_SCREEN && <>
-            <div className='title'>Ваше телефон</div>
-            <Input input={phone.bind} label='Телефон' ></Input>
-            <br />
-            <button className='btn btn-lg' disabled={!phone.value} onClick={ phoneNextHandler }>Далі</button>
-        </>}
-        {currentPage === INFO_TYPE_SCREEN && <>
-            <div className='title'>Оберіть тип профіля</div>
-            <button className='btn btn-lg btn-big' onClick={ typeClientNextHandler }>Клієнт</button>
-            <button className='btn btn-lg btn-big' onClick={ typeMasterNextHandler }>Майстер</button>
-        </>}        
-        {currentPage === INFO_NAME_SCREEN && <>
-            <div className='title'>Ваше ім’я</div>
-            <Input input={name.bind} label="Имя"></Input>
-            <br />
-            <button className='btn btn-lg' disabled={!name.value} onClick={ nameNextHandler }>Далі</button>
-        </>}
-        {currentPage === INFO_CONTACT_SCREEN && <>
-            <div className='title'>Оберіть і додайте зручний для вас мессенджери</div>
-            <Contacts {...contact.bind} ></Contacts>
-            <button className='btn btn-lg' onClick={() => infoHandler()}>Завершити реєстрацію</button>
-        </>}
-
-        {currentPage === INFO_TITLE_SCREEN && <>
-            <div className='title'>Назва вашої компанії (якщо немає, то ваше ім’я та прізвище)</div>
-            <Input input={name.bind} label='Компания' ></Input>
-            <br />
-            <button className='btn btn-lg' disabled={!name.value} onClick={ titleNextHandler }>Далі</button>
-        </>} 
-        {currentPage === INFO_CAT_SCREEN && <>
-            <div className='title'>Категорії, з якими ви працюєте</div>
-            <Select {...select.bind} />
-            <button className='btn btn-lg' 
-                    disabled={!select.cases.length} 
-                    onClick={ catNextHandler } >Далі</button>
-        </>}
-        {currentPage === INFO_MAP_SCREEN && <>
-            <div className='title'>Позначте ваш сервісний центр на мапі</div>
-            <div ref={elem} className='map'></div>
-            <button className='btn btn-lg' onClick={ mapNextHandler }>Далі</button>
-        </>}
-        {currentPage === INFO_PHOTO_SCREEN && <>
-            <div className='title'>Додайте фото вашого сервісного центру або ваші</div>
-            <FileLoader {...images.bind}></FileLoader>
-            <button className='btn btn-lg' onClick={ photoNextHandler }>Далі</button>
-        </>}
-
-        {stack.length > 0 && <>
-            <button className='back-btn' onClick={ backHandler }>
-                <FontAwesomeIcon icon={faArrowLeftLong} />
-            </button>
-        </>}
-
+        <div className="container">
+            <BackSection className='mb-auto' handler={backHandler} />
+            {currentSection(currentPage)}
         </div>
-    );
+    )
 }
 
-export default InfoPage;
+export default InfoPage

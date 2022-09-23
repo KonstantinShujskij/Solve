@@ -1,6 +1,7 @@
 {
     "port": 5000,
     "baseUrl": "http://localhost:3000",
+    "serverUrl": "http://localhost:5000",
     "jwtSecret": "NHrmJipPAavz6Juw",
     "mongoUri": "mongodb+srv://root:EFzszXjdI9k0whE5@cluster0.ashvdhv.mongodb.net/?retryWrites=true&w=majority",
     "googleClientId": "250552136806-j1hcq7dotmuus6ue5nf4u79s5rlvl9i5.apps.googleusercontent.com",

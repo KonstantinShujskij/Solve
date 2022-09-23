@@ -4,14 +4,14 @@ import Loader from '../components/Loader'
 
 
 function TokenPage() {
-    const [searchParams] = useSearchParams();
+    const [searchParams] = useSearchParams()
     
     useEffect(() => {
         const token = searchParams.get('token')
         const id = searchParams.get('id')
 
-        window.opener.authenticateCallback(token, id);
-        window.close();
+        window.opener.authenticateCallback(token, id)
+        window.close()
     }, [searchParams])
 
     return (
@@ -21,4 +21,4 @@ function TokenPage() {
     );
 }
 
-export default TokenPage;
+export default TokenPage

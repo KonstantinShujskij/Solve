@@ -1,0 +1,103 @@
+.profile__rating {
+    margin-bottom: 12px;
+}
+
+.rating {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.rating__item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.rating__value {
+    width: 68px;
+    height: 68px;
+    border-radius: 50%;
+    background: #F7F8FA;
+    border: 1px solid #FFFFFF;
+    box-shadow: -4px -4px 17px #FFFFFF, 4px 4px 17px rgba(0, 0, 0, 0.1);
+
+    font-size: 32px;
+    line-height: 38px;
+    color: #094067;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.rating__label {
+    font-family: 'Roboto';
+    font-style: normal;
+    font-weight: 500;
+    font-size: 14px;
+    line-height: 16px;
+    text-align: center;
+
+    color: #094067;
+    margin-top: 8px;
+}
+
+.profile__phone {
+    width: 100%;
+    font-weight: 400;
+    font-size: 20px;
+    padding: 0 10px;
+
+    color: #5F6C7B;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+}
+
+.profile-phone__icon {
+    margin-right: 10px;
+    height: 20px;
+    display: block;
+}
+
+.profile__social-list {
+    width: 100%;
+    margin-top: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 10px;
+}
+
+.profile__social {
+    height: 36px;
+    font-family: "fontello";
+    font-style: normal;
+    font-weight: normal;
+    font-size: 36px;
+    color: #3DA9FC;
+}
+
+
+.profile__adres {
+    width: 100%;
+    margin-top: 24px;
+    display: flex;
+    padding: 0 10px;
+    
+}
+
+.profile-adres__icon {
+    width: 28px;
+    height: 40px;
+}
+
+.profile-adres__info {
+    padding-left: 10px;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 19px;
+    color: #5F6C7B;
+}

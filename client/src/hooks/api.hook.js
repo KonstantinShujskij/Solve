@@ -43,6 +43,11 @@ export default function useApi() {
         catch(error) { throw error } 
     }
 
+    const infoUser = async (data) => {
+        try { return await publicRequest('api/user/info', data) }
+        catch(error) { console.log(error); return null } 
+    }
+
     const changeContactUser = async (data) => {
         try { return await protectedRequest('api/user/set-contacts', {...data}) }
         catch(error) { throw error } 
@@ -63,14 +68,24 @@ export default function useApi() {
         catch(error) { console.log(error); return [] }
     }
 
+    const loadDevice = async (data) => {
+        try { return await protectedRequest('api/device/load', data) }
+        catch(error) { console.log(error); return null }
+    }
+
     const loadLots = async () => {
         try { return await protectedRequest('api/device/lots') }
         catch(error) { console.log(error); return [] }
     }
 
-    const setBet = async (data) => {
+    const placeBet = async (data) => {
         try { return await protectedRequest('api/device/set-bet', data) }
         catch(error) { console.log(error); return [] }
+    }
+
+    const getBet = async (data) => {
+        try { return await protectedRequest('api/device/get-bet', data) }
+        catch(error) { console.log(error); return {} }
     }
 
     const getBets = async (data) => {
@@ -103,6 +118,11 @@ export default function useApi() {
         catch(error) { console.log(error); return [] }
     }
 
+    const acceptDevice = async (id) => {
+        try { return await protectedRequest('api/device/accept', { id }) }
+        catch(error) { console.log(error); return [] }
+    }
+
     return { 
         loginUser,
         loadUser,
@@ -113,12 +133,16 @@ export default function useApi() {
         createDevice,
         loadDevices,
         loadLots,
-        setBet,
+        placeBet,
         getBets,
+        getBet,
         acceptBet,
         cancelBet,
         getContract,
         acceptContract,
-        loadOrders
+        loadOrders,
+        loadDevice,
+        infoUser,
+        acceptDevice,
     }
 }

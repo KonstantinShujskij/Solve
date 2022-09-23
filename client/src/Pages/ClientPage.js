@@ -1,33 +1,33 @@
-import React, { useEffect } from 'react'
-import { useSelector } from "react-redux"
+import React from 'react'
+//import { useSelector } from "react-redux"
+import { Outlet, useNavigate } from "react-router-dom"
+import { FRONT_URL } from '../const'
+import MenuSection from '../sections/MenuSections'
 
-import { useNavigate } from "react-router-dom"
-import * as selectors from '../selectors'
-import useDevice from '../hooks/devices.hook'
-import Device from '../components/Device'
+//import * as selectors from '../selectors'
 
 
-function ClientPage() {
-    const navigate = useNavigate();
-    const list = useSelector(selectors.devices)
-
-    const user = useSelector(selectors.user)
-    const { refreshDevices } = useDevice()
+function ClientPage({active}) {
+    const navigate = useNavigate()
+    //const user = useSelector(selectors.user)
 
     return (
-        <div className="auth">
-            <div className='top'>
-                <div className='top__logo' onClick={() => navigate('/settings')}></div>
-                <div className='top__name'>{ user.name }</div>
+        <div className='container client'>
+            <div className='content'>
+                <div className='avatar small-avatar'>
+                    <img className='avatar__image' src={`${FRONT_URL}/images/avatar.png`} alt="avatar" />
+                </div>
             </div>
-            <div className='client-main'>
-                { list.map((device) => <Device device={device} key={device._id}></Device>) }
-                {!list.length && <div>Наразі жоден ваш пристрій не ремонтується </div>}
+
+            <Outlet />
+
+            <div className='button-wrap mt-auto'>
+                <button className='button w-100 card__button' onClick={() => navigate('/create')}>Создать</button>
             </div>
-            <button className='btn btn-lg mt-auto' onClick={() => refreshDevices()}>Обновить</button>
-            <button className='btn btn-lg mt-auto' onClick={() => navigate('/create')}>Создать</button>
+            
+            <MenuSection active={active}/>
         </div>
     )
 }
 
-export default ClientPage;
+export default ClientPage

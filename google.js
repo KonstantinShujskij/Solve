@@ -3,11 +3,10 @@ const passportGoogle = require('passport-google-oauth')
 const config = require('config')
 const userQueries = require('./queries/user.queries')
 
-
 const googleOptions = {
     clientID: config.get('googleClientId'),
     clientSecret: config.get('googleSecretKey'),
-    callbackURL: 'http://localhost:5000/api/auth/google/redirect'
+    callbackURL: `${config.get('serverUrl')}/api/auth/google/redirect`
 }
 
 const googleStrategy = new passportGoogle.OAuth2Strategy(googleOptions,

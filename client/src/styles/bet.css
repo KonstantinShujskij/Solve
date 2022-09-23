@@ -1,0 +1,40 @@
+.bet {
+    width: 100%;
+    padding-top: 18px;
+    padding-bottom: 16px;
+    margin-bottom: 16px;
+}
+
+.bet__title {
+    font-family: 'Roboto', sans-serif;
+    font-style: normal;
+    font-weight: 500;
+    font-size: 20px;
+    line-height: 23px;
+    text-decoration: none;
+    display: block;
+
+    color: #094067;
+}
+
+.bet__price {
+    font-weight: 500;
+    font-size: 32px;
+    line-height: 38px;
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.bet__text {
+    font-family: 'Roboto';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 19px;
+    width: 100%;
+
+    color: #5F6C7B;
+
+    margin: 10px 0;
+}
+  

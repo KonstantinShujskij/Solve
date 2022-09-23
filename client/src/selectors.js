@@ -8,3 +8,5 @@ export const userType = (state) => state.user.type
 export const user = (state) => state.user
 
 export const devices = (state) => state.devices
+
+export const history = (state) => state.history.current

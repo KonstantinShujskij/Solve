@@ -1,0 +1,50 @@
+.loader {
+    width: calc(100% + 16px);
+    margin: 0 -8px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+
+.loader__item {
+    width: 84px;
+    height: 84px;
+
+    background: #F7F8FA;
+    border: 1px solid #FFFFFF;
+    box-shadow: 4px 4px 17px rgba(0, 0, 0, 0.1), -4px -4px 17px #FFFFFF;
+    border-radius: 10px;
+    margin: 8px;
+}
+
+.loader__button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 48px;
+    color: #3DA9FC;
+}
+
+.loader__image {
+    position: relative;
+    overflow: hidden;
+}
+
+.loader__image img {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.loader-item__dismis {
+    position: absolute;
+    right: 6px;
+    top: 6px;
+    font-size: 20px;
+    color: #FFFFFF;
+}
