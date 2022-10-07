@@ -1,22 +1,30 @@
-import { useDispatch } from "react-redux"
-import { removeDevices, setDevices } from '../redux/actions'
+import { useDispatch, useSelector } from "react-redux"
+import { addDevice, removeDevices } from '../redux/actions'
 import { useCallback } from "react"
 import useApi from "./api.hook"
+import * as selectors from "../selectors"
 
 
 export default function useDevice() {
-    const dispath = useDispatch()
-    const { loadDevices } = useApi()
-    
-    const refreshDevices = useCallback(() => {
-        try { loadDevices().then((data) => { dispath(setDevices(data)) }) }
-        catch(e) { console.log(e) }
-    }, [dispath, loadDevices])
+    const { loadDevice } = useApi()
+    const dispatch = useDispatch()
 
-    const clearDevice = useCallback(() => dispath(removeDevices()), [dispath])
+    const devices = useSelector(selectors.devices)
+
+    
+    const refreshDevices = useCallback((list) => {
+        list.forEach((device) => {
+            if(devices[device.id] && devices[device.id].updatedAt === device.updatedAt) { return }
+            
+            loadDevice(device.id).then((device) => { dispatch(addDevice(device)) })
+        })
+    }, [loadDevice, dispatch, devices])
+
+    const clearDevices = useCallback(() => dispatch(removeDevices()), [dispatch])
+
 
     return { 
         refreshDevices,
-        clearDevice,
+        clearDevices
     }
 }

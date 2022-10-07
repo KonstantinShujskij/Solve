@@ -77,6 +77,12 @@
     font-weight: normal;
     font-size: 36px;
     color: #3DA9FC;
+    text-decoration: none;
+}
+
+.profile__social_none {
+    color: #5F6C7B;
+    pointer-events: none; 
 }
 
 

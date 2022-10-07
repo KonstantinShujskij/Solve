@@ -4,6 +4,7 @@ import { toLogin, toLogout } from "../redux/actions"
 import useUser from "./user.hook"
 import * as selectors from '../selectors'
 import useStatic from "./static.hook"
+import useDevice from "./devices.hook"
 
 export default function useAuth() {
     const dispath = useDispatch()
@@ -11,6 +12,7 @@ export default function useAuth() {
     const isUser = !!useSelector(selectors.userId)
     const { refreshUser, clearUser } = useUser()
     const { refreshStatic, clearStatic } = useStatic()
+    const { clearDevices } = useDevice()
     
     useEffect(() => { 
         if(token && !isUser) { refreshUser() }
@@ -24,6 +26,7 @@ export default function useAuth() {
 
     const logout = () => { 
         dispath(toLogout()) 
+        clearDevices()
         clearStatic()
     }
 

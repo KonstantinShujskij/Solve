@@ -1,17 +1,28 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { useSelector } from 'react-redux'
 import Device from '../components/Device'
+import useApi from '../hooks/api.hook'
 import useDevice from '../hooks/devices.hook'
 import useUnmount from '../hooks/unmount.hook'
 import * as selectors from '../selectors'
 
 
 function DevicesListSection() {
-    const list = useSelector(selectors.devices)
-
+    const { getDevices } = useApi()
     const { refreshDevices } = useDevice()
 
-    useUnmount(() => { refreshDevices() })
+    const devices = useSelector(selectors.devices)
+    
+    const [list, setList] = useState([])
+
+    const load = () => {
+        getDevices().then((list) => {
+            refreshDevices(list)
+            setList(list)
+        })
+    }
+
+    useUnmount(load)
     
 
     return (
@@ -22,8 +33,8 @@ function DevicesListSection() {
             </div>
 
             <div className='devices'>
-                { list.map((device) => <Device device={device} refreshHandler={() => refreshDevices()} key={device._id}></Device>) }  
-            </div> 
+                { list.map((item) => devices[item.id]? <Device device={devices[item.id]} refresh={load} key={item.id} /> : '') }  
+            </div>
         </>
     )
 }

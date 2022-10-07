@@ -28,8 +28,25 @@ module.exports = {
 
         } catch(error) { return error }        
     },
+    setAvatar: async (id, avatar) => {
+        try {
+            await User.updateOne({ _id: id }, { $set: { avatar } } ) 
+            return null;
+        } catch(error) { return error }        
+    },
+    setPhone: async (id, phone) => {
+        try {
+            await User.updateOne({ _id: id }, { $set: { phone } } ) 
+            return null;
+        } catch(error) { return error }        
+    },
     get: async (id) => {
         try { return await User.findOne({ _id: id }) } 
         catch(error) { console.log(error); return null }        
     },
+    getMasters: async () => {
+        try { return await User.find({ type: 'MASTER' }) } 
+        catch(error) { console.log(error); return [] }        
+    },
+
 }

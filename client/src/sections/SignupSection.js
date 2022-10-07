@@ -17,9 +17,11 @@ function SignupSection() {
     const password = useValidationInput('')
 
     const authHandler = async () => {
-        const form = { email: email.value, password: password.value }
-        const {token, userId} = await loginUser({...form})
-        login(token, userId)
+        const data = await loginUser(email.value, password.value)
+        if(data) { 
+            const {token, userId} = data
+            login(token, userId)
+        }
     }
 
     return (

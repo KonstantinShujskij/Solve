@@ -1,7 +1,9 @@
 import React from 'react'
 import { useSelector } from "react-redux"
+import Alert from './components/Alert'
 import {useRoutes} from "./routes"
 import * as selectors from './selectors'
+
 
 
 function App() {
@@ -16,6 +18,7 @@ function App() {
   return (
     <div>
       {routes}
+      <Alert />
     </div>
   )
 }

@@ -1,13 +1,15 @@
-import { REMOVE_DEVICES, SET_DEVICES } from "./types";
+import { PUSH_DEVICE, REMOVE_DEVICES } from "./types";
 
-const initialState = []
+const initialState = {}
 
 export default function devicesReducer(state=initialState, action) {
   switch(action.type) {
-      case SET_DEVICES:
-        return [...action.payload]
+      case PUSH_DEVICE:
+        const temp = {...state}
+        temp[action.payload._id] = action.payload
+        return {...temp}
       case REMOVE_DEVICES:
-        return initialState
+        return {}
       default:
         return state
   }

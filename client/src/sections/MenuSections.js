@@ -10,9 +10,9 @@ function MenuSection({className}) {
     const userType = useSelector(selectors.userType)
 
     return (
-        <div className={`menu mt-auto ${className? className : ''}`}>
+        <div className={`menu ${className? className : ''}`}>
             {(userType === 'CLIENT') && <>
-                <NavLink className='menu__item' to="/devices-list">
+                <NavLink className='menu__item' to="/">
                     <ReactSVG className='menu__icon' src={`${FRONT_URL}/icons/Home.svg`}></ReactSVG>
                     <div className='menu__label'>Мої Пристрої</div>
                 </NavLink>
@@ -22,7 +22,7 @@ function MenuSection({className}) {
                 </NavLink>
             </>}
             {(userType === 'MASTER') && <>
-                <NavLink className='menu__item' to="/work-list">
+                <NavLink className='menu__item' to="/">
                     <ReactSVG className='menu__icon' src={`${FRONT_URL}/icons/Home.svg`}></ReactSVG>
                     <div className='menu__label'>В роботі</div>
                 </NavLink>

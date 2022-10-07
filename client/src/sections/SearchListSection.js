@@ -1,17 +1,27 @@
 import React, { useState } from 'react'
+import { useSelector } from 'react-redux'
 import Lot from '../components/Lot'
 import useApi from '../hooks/api.hook'
+import useDevice from '../hooks/devices.hook'
 import useUnmount from '../hooks/unmount.hook'
-
+import * as selectors from '../selectors'
 
 function SearchListSection() {
-    const { loadLots } = useApi()
+    const { getLots } = useApi()
+    const { refreshDevices } = useDevice()
+
+    const devices = useSelector(selectors.devices)
 
     const [list, setList] = useState([])
 
-    useUnmount(() => { 
-        loadLots().then((lots) => setList(lots))
-    })
+    const load = () => {
+        getLots().then((list) => {
+            refreshDevices(list)
+            setList(list)
+        })
+    }
+
+    useUnmount(load)
 
     return (
         <>
@@ -20,7 +30,7 @@ function SearchListSection() {
             </div>
 
             <div className='list'>
-                {list.map(lot => <Lot device={lot} key={lot._id} />) }
+                {list.map((item) =>  devices[item.id]? <Lot device={devices[item.id]} key={item.id} /> : '') }
             </div>
             
         </>

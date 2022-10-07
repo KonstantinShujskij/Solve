@@ -9,26 +9,27 @@ import * as selectors from '../selectors'
 import { useSelector } from 'react-redux'
 import Input from '../components/base/Input'
 import useValidationInput from '../hooks/input.hook'
-import { useNavigate } from "react-router-dom"
-
+import BackSection from "../sections/BackSection"
+import MenuSection from "../sections/MenuSections"
+import useAlert from '../hooks/alert.hook'
+import * as initial from '../initial'
 
 function timeToDate(time) {
-    const date = new Date(time)
+    const date = new Date(parseInt(time))
     return date.toLocaleDateString() + " " + date.toLocaleTimeString().substring(0, 5)
 }
 
 function DevicePage() {
-    const navigate = useNavigate()
+    const { loadBet, loadBets, loadDevice, placeBet } = useApi()   
+    const { pushMess } = useAlert()
     const params = useParams()
+    
     const userType = useSelector(selectors.userType)
     const userId = useSelector(selectors.userId)
-    
-    const { loadDevice, getBets, getBet, placeBet } = useApi()    
 
-    const [device, setDevice] = useState({status: '', images: []})
-    const [bets, setBets] = useState([])
+    const [device, setDevice] = useState(initial.device)
     const [bet, setBet] = useState(null)
-
+    const [bets, setBets] = useState([])
 
     const [isBeting, setIsBeting] = useState(false) 
     const [isBet, setIsBet] = useState(false) 
@@ -36,98 +37,105 @@ function DevicePage() {
     const betPrice = useValidationInput('')
     const betDescription = useValidationInput('')
 
-    useUnmount(() => { 
-        loadDevice({ id: params.id}).then((data) => {
-            setDevice(data)
+    const load = () => { loadDevice(params.id).then((device) => {
+        setDevice(device)
 
-            if(data.status === 'SEARCH') {
-                getBets({ids: data.bets}).then((data) => {
-                    setBets(data)
-                    if(data.filter(bet => bet.owner === userId).length) { setIsBet(true) }
-                })    
-            }
-            else if(data.status === 'RESERVE') {
-                getBet({id: data.bet}).then((data) => {
-                    setBet(data)
-                })
-            }
-        })
-    })
+        if(device.bet) { loadBet(device.bet).then((bet) => setBet(bet)) }
+        else { loadBets(device.bets).then((bets) => { 
+            setBets(bets) 
+            if(bets.filter((bet) => bet.owner === userId).length) { setIsBet(true) }
+        })}
+    })}
 
     const setBetHandler = () => {
-        placeBet({id: params.id, price: betPrice.value, description: betDescription.value}).then((res) => {
-            console.log(res);
-            setIsBeting(false) 
-            setIsBet(true)
-            return getBets({ids: device.bets})
-        }).then((data) => {
-            setBets(data)
-            console.log('ry', data); 
-        })    
+        placeBet(params.id, betPrice.value, betDescription.value).then((res) => {
+            if(res) {
+                setIsBeting(false) 
+                pushMess('Ставка сделана')
+                setIsBet(true)
+                load()
+            }
+        })  
     }
+
+    useUnmount(load)
 
     return (
         <div className='container device-page'>
-        <div className='header'>
-            <button className='back-btn' onClick={() => navigate(-1)}>
-                <span className='icon'>{ICONS.back}</span>
-            </button>
-        </div>
 
-        <div className='list'>
+        <BackSection />
+
+        <div className='list device-page__list'>
             <div className='card device'>
                 {(userType === "MASTER" && <>
                     <div className="device__row device__label">
-                        <div className="device__icon icon" style={{color: "#5F6C7B"}}>{ICONS.circle}</div>
+                        <div className="device__icon icon" style={{color: "#5F6C7B"}}>{ICONS.label}</div>
                         <div className="device__text">
-                            <p>Категорія: {device? device.category : ''}</p>
+                            <p>Категорія: {device.category}</p>
                         </div>
                     </div>
-                    <div className="w-100 text lot__time">{device? timeToDate(device.time) : ''}</div>
+                    <div className="w-100 text lot__time">{device? timeToDate(device.createdAt) : ''}</div>
                 </>)}
 
                 <div className="device__row">
                     <div className="device__icon icon">{ICONS.model}</div>
-                    <div className="device__title">{device? device.model: ''}</div>
+                    <div className="device__title">{device.model}</div>
                 </div>
                 <div className="card__hr"></div>
                 <div className='card__space'></div>
                 <div className='device__image'>
-                    {device && <img src={`${FRONT_URL}/store/images/${device.images[0]}`} alt='device' />}
+                    <img src={`${FRONT_URL}/store/images/${device.images[0]}`} alt='device' />
                 </div>
                 <div className='card__space'></div>
-                <div className='device__text'>
-                    Опис проблеми: Lorem ipsum dolor sit amet, populo ornatus nam eu.
-                </div>
+                <div className='device__text'>Опис проблеми: {device.description}</div> 
             </div>
 
-            {(userType === "MASTER" && !isBet && <>
-                {(!isBeting && <button className='button w-100' onClick={() => setIsBeting(true)}>Взяти Участь</button> )}
-
-                {(isBeting && 
-                <div className='card'>
-                    <Input input={betPrice.bind} label="Ваша ставка" />
-                    <div className='card__space'></div>
-                    <textarea className='input textarea' {...betDescription.bind} placeholder='Коментар'></textarea>
-                    <button className='w-100 button card__button' onClick={setBetHandler}>Зробити Ставку</button>
-                </div>
-                )}
-            </>)}
-
-            {(device.status === 'SEARCH' && bets.length > 0 && <>
+            {(device.status === 'RESERVE' && bet && <Bet bet={bet} refresh={load} />)}
+           
+            {(device.status === 'SEARCH' && <>
                 <div className='separator'>
                     <div className='separator__hr'></div>
                     <span className='separator__text text'>Ставки</span>
                     <div className='separator__hr'></div>
                 </div>
-                
-                <div className='bets-list'>
-                    {bets.map((bet) => <Bet bet={bet} key={bet._id} />)}
-                </div>            
+
+                {(userType === "MASTER" && !isBet && <>
+                    {(!isBeting && <>
+                        <button className='button w-100' onClick={() => setIsBeting(true)}>Взяти Участь</button> 
+                        <div className='card__space'></div>
+                    </>)}
+
+                    {(isBeting && <>
+                        <div className='card'>
+                            <Input input={betPrice.bind} label="Ваша ставка" />
+                            <div className='card__space'></div>
+                            <textarea className='input textarea' {...betDescription.bind} placeholder='Коментар'></textarea>
+                            <button className='w-100 button card__button' onClick={setBetHandler}>Зробити Ставку</button>
+                        </div>
+                        <div className='card__space'></div>
+                    </>)}
+                </>)} 
+
+                {(!!bets.length && 
+                    <div className='bets-list'>
+                        {bets.map((bet) => <Bet bet={bet} refresh={load} key={bet._id} />)}
+                    </div>   
+                )}
+
+                {(!bets.length && <div className='text text-center'>Ставок нет</div>)}
             </>)}
 
-            {(device.status === 'RESERVE' && bet && <Bet bet={bet} status='pact' />)}
+            {(device.status === 'CHECK' && userType === "MASTER" && <>
+                <div className='check__buttons'>
+                    <button className='w-100 button card__button red'>Відхилити</button>
+                    <button className='w-100 button card__button'>Прийняти</button>
+                </div>
+            </>)}
+
+
         </div>
+
+        <MenuSection className="mt-auto" />
 
         </div>
     )

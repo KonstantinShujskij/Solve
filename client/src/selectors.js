@@ -8,5 +8,7 @@ export const userType = (state) => state.user.type
 export const user = (state) => state.user
 
 export const devices = (state) => state.devices
+export const currentDevice = (state) => state.app.selectDevice 
 
-export const history = (state) => state.history.current
+export const mess = (state) => state.alert.mess
+export const error = (state) => state.alert.error

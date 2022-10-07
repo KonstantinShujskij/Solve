@@ -19,6 +19,11 @@ import AuctionListSection from "./sections/AuctionListSection"
 import WorkListSection from "./sections/WorkListSection"
 import ClaimListSection from "./sections/ClaimListSection"
 import SearchListSection from "./sections/SearchListSection"
+import SettingsMenuSection from "./sections/SettingsMenuSection"
+import SettingsPhoneSection from "./sections/SettingsPhoneSection"
+import SettingsSocialSection from "./sections/SettingsSocialSection"
+import TestPage from "./Pages/TestPage"
+import AcceptPage from "./Pages/AcceptPage"
 
 
 export const useRoutes = (isAuthenticated, isCompletely, type) => {
@@ -28,18 +33,22 @@ export const useRoutes = (isAuthenticated, isCompletely, type) => {
                 return(
                     <Routes>
                         <Route path="/" element={<ClientPage />} exact>
+                            <Route index element={<DevicesListSection />} exact />
                             <Route path="auction-list" element={<AuctionListSection />} exact />
-                            <Route path="devices-list" element={<DevicesListSection />} exact />
-
-                            <Route path="*" element={<DevicesListSection />} exact />
                         </Route>                       
-
-                        <Route path="/settings" element={<SettingsPage />} exact />
+                        <Route path="/settings" element={<SettingsPage />} exact>
+                            <Route index element={<SettingsMenuSection />} exact />
+                            <Route path="phone" element={<SettingsPhoneSection />} exact />
+                            <Route path="social" element={<SettingsSocialSection />} exact />
+                        </Route>
                         <Route path="/create" element={<CreatePage />} exact />
                         <Route path="/search" element={<SearchPage />} exact />
                         <Route path="/device/:id" element={<DevicePage />} exact />
                         <Route path="/contract/:id" element={<ContractPage />} exact />
+                        <Route path="/accept/:device/:owner" element={<AcceptPage />} exact />
                         <Route path="/profile/:id" element={<ProfilePage />} exact />
+
+                        <Route path="/test" element={<TestPage />} exact />
                         
                         <Route path="*" element={<ClientPage />} exact>
                             <Route path="*" element={<DevicesListSection />} exact />
@@ -51,14 +60,19 @@ export const useRoutes = (isAuthenticated, isCompletely, type) => {
                 return(
                     <Routes>
                         <Route path="/" element={<MasterPage />} exact>
+                            <Route index element={<WorkListSection />} exact />
                             <Route path="search-list" element={<SearchListSection />} exact />
                             <Route path="claim-list" element={<ClaimListSection />} exact />
-                            <Route path="work-list" element={<WorkListSection />} exact />
 
                             <Route path="*" element={<DevicesListSection />} exact />
                         </Route>        
                         <Route path="/device/:id" element={<DevicePage />} exact />
-                        <Route path="/settings" element={<SettingsPage />} exact />
+                        <Route path="/contract/:id" element={<ContractPage />} exact />
+                        <Route path="/settings" element={<SettingsPage />} exact>
+                            <Route index element={<SettingsMenuSection />} exact />
+                            <Route path="phone" element={<SettingsPhoneSection />} exact />
+                            <Route path="social" element={<SettingsSocialSection />} exact />
+                        </Route>
 
                         <Route path="*" element={<MasterPage />} exact />
                     </Routes>

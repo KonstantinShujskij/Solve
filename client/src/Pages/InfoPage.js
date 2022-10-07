@@ -82,6 +82,8 @@ function InfoPage() {
         if(type === 'MASTER') {
             const position = marker.current? marker.current.getPosition() : null
 
+            console.log(position);
+
             images.list.forEach((item) => form.append('images', item.file))           
             select.cases.forEach((item) => form.append('cases', item))
             form.append('lat', position? position.lat() : null)

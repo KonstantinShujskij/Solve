@@ -1,12 +1,10 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { useSelector } from "react-redux"
 
-import { useNavigate } from "react-router-dom"
-import useAuth from '../hooks/auth.hook'
+import { Outlet } from "react-router-dom"
 import * as selectors from '../selectors'
-import { FRONT_URL, ICONS, SETTINGS_CONTACTS_SCREEN, SETTINGS_MENU_SCREEN, SETTINGS_PHONE_SCREEN } from '../const'
-import Contacts from '../components/Contacts'
-import useContacts from '../hooks/contacts.hook'
+import { AVATAR, FRONT_URL } from '../const'
+
 import useApi from '../hooks/api.hook'
 import useUser from '../hooks/user.hook'
 import BackSection from '../sections/BackSection'
@@ -17,79 +15,34 @@ import MenuSection from '../sections/MenuSections'
 
 
 function SettingsPage() {
-    const navigate = useNavigate();
-    const { logout } = useAuth()
-    const { changeContactUser } = useApi()
+    const { changeAvatar } = useApi()
     const { refreshUser } = useUser()
 
     const user = useSelector(selectors.user)
 
-    const contact = useContacts({
-        telegram: user.telegram,
-        instagram: user.instagram,
-        whatsapp: user.whatsapp,
-        facebook: user.facebook
-    }) 
-
-    const [currentScreen, setCurrentScreen] = useState(SETTINGS_MENU_SCREEN)
-    const [stack, setStack] = useState([])
-
-    const nextHandler = (page) => { 
-        setCurrentScreen((prvPage) => {
-            setStack((prvStack) => [...prvStack, prvPage])
-            return page
-        })
-    }
-
-    const backHandler = () => {
-        const temp = [...stack]
-        const page = temp.pop()
-
-        if(!page) return navigate(-1)
-
-        setStack(temp)
-        setCurrentScreen(page)
-    }
-
-    const saveContactsHandler = async () => {
-        await changeContactUser({...contact.values})
-        refreshUser()
-        backHandler()
-    }
+    const saveAvatar = async (file) => { changeAvatar(file).then(() => refreshUser()) }
 
     return (
        <div className='container settings'>
-            <BackSection handler={() => backHandler()} />
+            <BackSection> 
+                <div className='logo mr-auto'>
+                    <img className='logo__image' src={`${FRONT_URL}/images/logo.svg`} alt='logo' />
+                </div>
+            </BackSection>
 
             <div className='list'>
                 <div className='content'>
                     <h2 className='title content__title'>Налаштування профілю</h2>
                 </div>
 
-                <Avatar path={`${FRONT_URL}/images/avatar.png`} onEdit={(files) => console.log(files)} />
+                <Avatar path={`${FRONT_URL}/store/images/${user.avatar? user.avatar : AVATAR}`} onEdit={saveAvatar} />
 
                 <h2 className='title content__title settings__welcome'>Вітаємо, {user.name}!</h2>
             
-                <div className='card'>
-                    {(currentScreen === SETTINGS_MENU_SCREEN && <>
-                        <button className='button w-100 card__button' onClick={() => nextHandler(SETTINGS_PHONE_SCREEN)}>Змінити контактний номер</button>
-                        <button className='button w-100 card__button' onClick={() => nextHandler(SETTINGS_CONTACTS_SCREEN)}>Налаштувати соціальні мережі</button>
-                        <button className='button w-100 card__button button-grey' >Повідомити про помилку</button>
-                        <button className='button w-100 card__button red' onClick={() => logout()}>Вийти з облікового запису</button>
-                    </>)}
-
-                    {(currentScreen === SETTINGS_PHONE_SCREEN && <>
-                        <div>Phone</div>
-                    </>)}
-
-                    {(currentScreen === SETTINGS_CONTACTS_SCREEN && <>
-                        <Contacts {...contact.bind} ></Contacts>
-                        <button className='button w-100 card__button' onClick={() => saveContactsHandler()}>Save</button>
-                    </>)}            
-                </div>
+                <Outlet />
             </div>
 
-            <MenuSection />
+            <MenuSection className="mt-auto" />
        </div>
     )
 }

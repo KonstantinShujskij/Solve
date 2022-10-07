@@ -1,0 +1,22 @@
+.rating-form {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #737373;
+    padding-left: 2px;
+}
+
+.rating-form__label {
+    margin-right: auto;
+    font-weight: bold;
+}
+
+.rating-form__star {
+    margin: 0 4px;
+    font-size: 20px;
+}
+
+.rating-form__star_active {
+    color:#FCC73D;
+}

@@ -9,8 +9,7 @@ export default function useStatic() {
     const { getCategories } = useApi()
     
     const refreshCategories = useCallback(() => {
-        try { getCategories().then(({categories}) => { dispath(setCategories(categories)) }) }
-        catch(e) { console.log(e) }
+        getCategories().then(({categories}) => { dispath(setCategories(categories)) })
     }, [dispath, getCategories])
 
     const clearCategories = useCallback(() => dispath(removeCategories()), [dispath])

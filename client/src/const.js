@@ -11,10 +11,6 @@ export const INFO_PHOTO_SCREEN = 'INFO:PHOTO_SCREEN'
 export const CLIENT_LIST_SCREEN = 'CLIENT:LIST_SCREEN'
 export const CLIENT_AUCTION_SCREEN = 'CLIENT:AUCTION_SCREEN'
 
-export const SETTINGS_MENU_SCREEN = 'SETTINGS:MENU_SCREEN'
-export const SETTINGS_PHONE_SCREEN = 'SETTINGS:PHONE_SCREEN'
-export const SETTINGS_CONTACTS_SCREEN = 'SETTINGS:CONTACTS_SCREEN'
-
 export const ICONS = {
     phone: "\ue80e",
     telegram: "\ue801",
@@ -42,7 +38,10 @@ export const ICONS = {
     label: "\ue814",
     edit: "\ue815",
     bet: "\ue816",
-    coment: "\ue81a"
+    coment: "\ue81a",
+    user: "\ue81b",
+    master: "\ue81c",
+    star: "\ue81d"
 }
 
 export const SOCIAL = {
@@ -60,6 +59,8 @@ export const BASE_URL = 'http://localhost:5000'
 
 export const MASTER = 'MASTER'
 export const CLIENT = 'CLIENT'
+
+export const AVATAR = '../../images/avatar.png'
 
 export const MAP_STYLE = [
     {

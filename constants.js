@@ -1,10 +1,12 @@
-const SEARCH = 'SEARCH'
-const RESERVE = 'RESERVE'
+const CREATE = 'CREATE'
 const CHECK = 'CHECK'
 const CANCLE = 'CANCEL'
+const SEARCH = 'SEARCH'
+const RESERVE = 'RESERVE'
 const PACT = 'PACT'
 const CONFIRM = 'CONFIRM'
 
+
 module.exports = {
-    status: { SEARCH, RESERVE, CHECK, CANCLE, PACT, CONFIRM }
+    status: { CREATE, CHECK, CANCLE, SEARCH, RESERVE, PACT, CONFIRM }
 }

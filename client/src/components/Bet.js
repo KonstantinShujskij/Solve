@@ -5,22 +5,34 @@ import '../styles/bet.css'
 import useUnmount from "../hooks/unmount.hook";
 import { useSelector } from "react-redux";
 import * as selectors from '../selectors'
-import { useNavigate } from "react-router-dom";
+import useAlert from "../hooks/alert.hook";
 
 
-export default function Bet({bet, status='wait'}) {
-    const userType = useSelector(selectors.userType)
-    
+export default function Bet({bet, refresh}) {
     const { acceptBet, cancelBet, infoUser } = useApi()
+    const { pushMess } = useAlert()
 
-    const navigate = useNavigate()
+    const userId = useSelector(selectors.userId)
 
     const [owner, setOwner] = useState(null)
 
-    useUnmount(() => { infoUser({id: bet.owner}).then((data) => setOwner(data)) })
+    const acceptHandler = () => { acceptBet(bet._id).then((res) => {
+        if(res) {
+            pushMess('Исполнитель выбран')
+            refresh()
+        }        
+    })}
 
-    const acceptHandler = () => { acceptBet({ id: bet._id }).then(() => navigate(0)) }
-    const cancelHandler = () => { cancelBet({ id: bet._id }).then(() => navigate(0)) }
+    const cancelHandler = () => { cancelBet(bet._id).then((res) => {
+        if(res) {
+            pushMess('Выбор сполнителя отменен')
+            refresh()
+        }        
+    })}
+
+    const load = () => { infoUser(bet.owner).then((user) => setOwner(user)) }
+
+    useUnmount(load)
 
     return (
         <div className="card bet">
@@ -29,11 +41,19 @@ export default function Bet({bet, status='wait'}) {
             <div className="bet__text">Коментар: {bet.description}</div>
             <div className="card__hr"></div>
             <div className="card__space"></div>
-            {(owner && <UserPreview id={owner._id} avatar={'master.png'} adres="вул. Чарівна, 11" name={owner.name} />)}
-            {(userType === 'CLIENT' && <>
-                {(status === 'wait' && <button className='button w-100 card__button' onClick={acceptHandler}>Принять</button> )}
-                {(status === 'pact' && <button className='button w-100 card__button' onClick={cancelHandler}>Отменить</button> )}
-            </>)}
+            {(owner && <UserPreview id={owner._id} name={owner.name} avatar={owner.avatar} />)}
+
+            {(bet.accept && bet.owner === userId && 
+                <button className='button w-100 card__button red' onClick={cancelHandler}>Отказаться</button>
+            )}
+
+            {(bet.accept && bet.client === userId && 
+                <button className='button w-100 card__button' onClick={cancelHandler}>Отменить</button>
+            )}
+
+            {(!bet.accept && bet.client === userId && 
+                <button className='button w-100 card__button' onClick={acceptHandler}>Принять</button>
+            )}
         </div>
     )
 }

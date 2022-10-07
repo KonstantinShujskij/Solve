@@ -2,6 +2,7 @@ const {Schema, model, Types} = require('mongoose')
 
 const schema = new Schema({
     data: {type: String},
+    price: {type: String},
     device: {type: Types.ObjectId, ref: 'Device'},
 
     client: {type: Types.ObjectId, ref: 'User'},

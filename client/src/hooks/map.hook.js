@@ -28,6 +28,14 @@ export default function useMap() {
                     draggable: true,
                     map: map.current,
                 })
+
+                const geo = new google.maps.Geocoder().geocode({
+                    latLng: marker.current.getPosition()
+                }, (results, status) => {
+                    console.log(status);
+                    console.log(results);
+                })
+                
             })            
         })
     }, [])
@@ -35,3 +43,21 @@ export default function useMap() {
 
     return { elem, marker }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

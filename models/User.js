@@ -9,12 +9,15 @@ const schema = new Schema({
     cases: [ {type: String} ],
     lat: {type: Number},
     lng: {type: Number},
+    adres: {type: String},
     info: {type: Boolean, default: false},
     telegram: {type: String},
     instagram: {type: String},
     facebook: {type: String},
     whatsapp: {type: String},
-    images: [ {type: String} ]
+    images: [ {type: String} ],
+    avatar: {type: String},
+    reviews: []
 })
 
 module.exports = model('User', schema)

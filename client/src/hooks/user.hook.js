@@ -8,10 +8,7 @@ export default function useUser() {
     const dispath = useDispatch()
     const { loadUser } = useApi()
     
-    const refreshUser = useCallback(() => {
-        try { loadUser().then((user) => { dispath(setUser(user)) }) }
-        catch(e) { console.log(e) }
-    }, [dispath, loadUser])
+    const refreshUser = useCallback(() => loadUser().then((user) => dispath(setUser(user))), [dispath, loadUser])
 
     const clearUser = useCallback(() => dispath(removeUser()), [dispath])
 
