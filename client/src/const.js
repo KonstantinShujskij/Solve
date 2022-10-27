@@ -51,16 +51,20 @@ export const SOCIAL = {
     viber: { name: 'Viber', icon: ICONS.viber, placeholder: '+380000000000' }
 }
 
+export const LOAD_COUNT = 5
 export const FRONT_URL = 'http://localhost:3000'
 export const BASE_URL = 'http://localhost:5000'
 
-// export const FRONT_URL = 'http://whatyoydoing.site'
-// export const BASE_URL = 'http://whatyoydoing.site'
+// export const FRONT_URL = 'http://solve-service.com'
+// export const BASE_URL = 'http://solve-service.com'
 
 export const MASTER = 'MASTER'
 export const CLIENT = 'CLIENT'
 
 export const AVATAR = '../../images/avatar.png'
+
+export const DOWNWARD = -1
+export const UPWARD = 1
 
 export const MAP_STYLE = [
     {

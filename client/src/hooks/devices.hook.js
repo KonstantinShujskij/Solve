@@ -11,19 +11,31 @@ export default function useDevice() {
 
     const devices = useSelector(selectors.devices)
 
+
+
+    const refreshDevice = useCallback(async (id) => {
+        return loadDevice(id).then((device) => { 
+            if(!device) { return }
+
+            dispatch(addDevice(device)) 
+
+            return device
+        })
+    }, [loadDevice, dispatch])
     
     const refreshDevices = useCallback((list) => {
-        list.forEach((device) => {
+        list.forEach((device) => { 
             if(devices[device.id] && devices[device.id].updatedAt === device.updatedAt) { return }
-            
-            loadDevice(device.id).then((device) => { dispatch(addDevice(device)) })
+
+            refreshDevice(device.id)
         })
-    }, [loadDevice, dispatch, devices])
+    }, [devices, refreshDevice])
 
     const clearDevices = useCallback(() => dispatch(removeDevices()), [dispatch])
 
 
     return { 
+        refreshDevice,
         refreshDevices,
         clearDevices
     }

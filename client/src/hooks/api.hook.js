@@ -5,33 +5,38 @@ import * as selectors from '../selectors'
 import { BAD_AUTH } from "../errors"
 import { toLogout } from "../redux/actions"
 import useAlert from "./alert.hook"
+import { LOAD_COUNT } from "../const"
 
 
 export default function useApi() {
     const token = useSelector(selectors.token)
-    const { request } = useHttp()
     const dispath = useDispatch()
-    const { pushError } = useAlert()
+
+    const { request } = useHttp()
+    const { pushError } = useAlert()   
+    
+    const auctionFilter = useSelector(selectors.auctionFilter) 
+    const ordersFilter = useSelector(selectors.ordersFilter)
+    
 
     const publicRequest = useCallback(async (queris, data, type) => {
-        
-        try {
-            return await request(queris, 'POST', data, {}, type)
-        } catch(error) { 
+        try { return await request(queris, 'POST', data, {}, type) } 
+        catch(error) { 
             pushError(error.message)
             throw error 
         } 
     }, [request, pushError])
 
     const protectedRequest = useCallback(async (queris, data, type) => {
-        try {
-            return await request(queris, 'POST', data, {Authorization: `Bearer ${token}`}, type)
-        } catch(error) { 
+        try { return await request(queris, 'POST', data, {Authorization: `Bearer ${token}`}, type) }
+        catch(error) { 
             if(error.message === BAD_AUTH) { dispath(toLogout()) } 
+
             pushError(error.message)
             throw error
         } 
     }, [request, dispath, pushError, token])
+
 
     const loginUser = async (email, password) => {
         try { return await publicRequest('api/auth/login', {email, password}) }
@@ -63,16 +68,6 @@ export default function useApi() {
         catch(error) { return null } 
     }
 
-    const getContract = async (id) => {
-        try { return await protectedRequest('api/device/get-contract', {id}) }
-        catch(error) { return [] }
-    }
-
-    const acceptContract = async (data) => {
-        try { return await protectedRequest('api/device/accept-contract', data) }
-        catch(error) { return {} }
-    }
-
     const loadOrders = async (data) => {
         try { return await protectedRequest('api/device/orders', data) }
         catch(error) { return [] }
@@ -92,49 +87,6 @@ export default function useApi() {
 
     const loadBets = async (ids) => {
         try { return await protectedRequest('api/device/load-bets', {ids}) }
-        catch(error) { return [] }
-    }
-
-    const changeContact = async (data) => {
-        try { return await protectedRequest('api/user/set-contacts', {...data}) }
-        catch(error) { throw error } 
-    }
-
-    const changeAvatar = async (avatar) => {
-        const form = new FormData()
-        form.append('avatar', avatar)
-
-        try { return await protectedRequest('api/user/set-avatar', form, 'form') }
-        catch(error) { return null }
-    }
-
-    const changePhone = async (phone) => {
-        try { return await protectedRequest('api/user/set-phone', {phone}) }
-        catch(error) { return false }
-    }
-
-    const getDevices = async () => {
-        try { return await protectedRequest('api/device/devices') }
-        catch(error) { return [] }
-    }
-
-    const getAuctions = async () => {
-        try { return await protectedRequest('api/device/auctions') }
-        catch(error) { return [] }
-    }
-
-    const getLots = async () => {
-        try { return await protectedRequest('api/device/lots') }
-        catch(error) { return [] }
-    }
-
-    const getOrders = async () => {
-        try { return await protectedRequest('api/device/orders') }
-        catch(error) { return [] }
-    }
-
-    const getClaims = async () => {
-        try { return await protectedRequest('api/device/claims') }
         catch(error) { return [] }
     }
 
@@ -168,8 +120,8 @@ export default function useApi() {
         catch(error) { return null }
     }
 
-    const placeBet = async (id, price, description) => {
-        try { return await protectedRequest('api/device/set-bet', {id, price, description}) }
+    const placeBet = async (deviceId, price, description) => {
+        try { return await protectedRequest('api/device/set-bet', {deviceId, price, description}) }
         catch(error) { return null }
     }
 
@@ -178,50 +130,137 @@ export default function useApi() {
         catch(error) { return null }
     }
 
-    // experemetns
+    //-------------------------Complited and coment
 
-    const loadDevices = async () => {
-        try { return await protectedRequest('api/device/list') }
+    //Запрос меняет аватар пользователя, необходимо передать файл 
+    const changeAvatar = async (avatar) => {
+        const form = new FormData()
+        form.append('avatar', avatar)
+
+        try { return await protectedRequest('api/user/set-avatar', form, 'form') }
+        catch(error) { return false }
+    }
+
+    //Запрос получает новый телефон, и если он изменен отправляет sms для подтврерждения 
+    //Возвращает token если телефон новый и exist если телефон остался прежднем
+    //Необходимо передать номер телефона в международном формате
+    const changePhone = async (phone) => {
+        try { return await protectedRequest('api/user/set-phone', {phone}) }
+        catch(error) { return false }
+    }
+
+    //Запрос подтверждает изменение телефона пользователя, необходимо передать токен и код
+    const confirmPhone = async (codeToken, code) => {
+        try { return await protectedRequest('api/user/confirm-phone', {token: codeToken, code}) }
+        catch(error) { return false }
+    }
+
+    //Запрос меняет контакты социальных сетей, необходимо передать словарь, 
+    //где ключ - название соц. сети, а значение - контакт 
+    const changeContact = async (contacts) => {
+        try { return await protectedRequest('api/user/set-contacts', {...contacts}) }
+        catch(error) { return false } 
+    }
+
+
+    //Запрос меняет рабочий статус устройста, необходимо передать индентификатор и новый статус
+    const changeDeviceStatus = async (id, status) => {
+        try { return await protectedRequest('api/device/change-status', {id, status}) }
+        catch(error) { return false } 
+    }
+
+    //Запрос меняет рабочий заметку устройста, необходимо передать индентификатор и новую заметку 
+    const changeDeviceNotes = async (id, notes) => {
+        try { return await protectedRequest('api/device/change-notes', {id, notes}) }
+        catch(error) { return false } 
+    }
+
+    
+    // Загрузка списков устройств
+
+    const getDevices = async (skip=0, limit=LOAD_COUNT) => {
+        try { return await protectedRequest('api/devices/devices', {limit, skip}) }
         catch(error) { return [] }
     }
 
-    return { 
-        loginUser,
-        loadUser,
-        initialClient,
-        initialMaster,
-        
-        getCategories,
-        createDevice,
-        loadLots,
-        acceptBet,
-        getContract,
-        acceptContract,
-        findMasters,
-        loadOrders,
-   
+    const getAuctions = async (skip=0, limit=LOAD_COUNT) => {
+        try { return await protectedRequest('api/devices/auctions', {limit, skip}) }
+        catch(error) { return [] }
+    } 
 
-        //experements
-        loadDevices,
+    const getLots = useCallback(async (skip=0, limit=LOAD_COUNT) => {
+        try { return await protectedRequest('api/devices/lots', {filter: auctionFilter, limit, skip}) }
+        catch(error) { return [] }
+    }, [protectedRequest, auctionFilter])
+
+    const getOrders = useCallback(async (skip=0, limit=LOAD_COUNT) => {
+        try { return await protectedRequest('api/devices/orders', {filter: ordersFilter, limit, skip}) }
+        catch(error) { return [] }
+    }, [protectedRequest, ordersFilter])
+
+    const getClaims = async (skip=0, limit=LOAD_COUNT) => {
+        try { return await protectedRequest('api/devices/claims', {limit, skip}) }
+        catch(error) { return [] }
+    }
 
 
-        // complited
-        loadBets,
-        placeBet,
-        changeContact,
+    //Запрос возвращает контракт, необходимо передать индентификатор 
+    const loadContract = async (id) => {
+        try { return await protectedRequest('api/device/get-contract', {id}) }
+        catch(error) { return null }
+    }
+
+
+    //Запрос подтверждает контракт, необходимо передать id контракта, установленую цену и описание
+    const acceptContract = async (id, price, data) => {
+        try { return await protectedRequest('api/device/accept-contract', {id, price, data}) }
+        catch(error) { return false }
+    }
+
+    //Запрос подтверждает заявку, необходимо передать индинтефикатор устройства
+    const acceptClaim = async (id) => {
+        try { return await protectedRequest('api/device/accept-claim', {id}) }
+        catch(error) { return false }
+    }
+
+    //Запрос отклоняет заявку, необходимо передать индинтефикатор устройства
+    const cancelClaim = async (id) => {
+        try { return await protectedRequest('api/device/cancel-claim', {id}) }
+        catch(error) { return false }
+    }
+
+    //Запрос отправляет девайс на аукцион, необходимо передать индетификатор
+    const pushAuction = async (id) => {
+        try { return await protectedRequest('api/device/push-auction', {id}) }
+        catch(error) { return false }
+    }   
+
+    
+    return { loginUser, loadUser, initialClient, initialMaster, getCategories, createDevice, loadLots, 
+        acceptBet, findMasters, loadOrders,
+        loadBets, placeBet, loadDevice, loadBet, infoUser,      
+        cancelBet, acceptDevice, sendDevice, cancelClaim,
+        acceptClaim, 
+
+        //coplited and coment 
         changeAvatar,
         changePhone,
-        loadDevice,  
-        loadBet,
-        infoUser,      
-        cancelBet,
-        acceptDevice,
-        sendDevice,
+        changeContact,
 
+        confirmPhone,
+
+        changeDeviceStatus,
+        changeDeviceNotes,
+        
         getDevices,
         getAuctions,
         getOrders,
         getClaims,
-        getLots,
+        getLots, 
+
+        loadContract,
+        acceptContract,
+
+        pushAuction,
     }
 }

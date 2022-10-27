@@ -1,5 +1,5 @@
 const {Router} = require('express')
-const {check, validationResult} = require('express-validator')
+const {check, validationResult, body} = require('express-validator')
 const jwt = require('jsonwebtoken')
 const config = require('config')
 const auth = require('../middleware/auth.middleware')
@@ -9,7 +9,12 @@ const userQueries = require('../queries/user.queries')
 const constants = require('../constants')
 const Bet = require('../models/Bet')
 const Contract = require('../models/Contract')
+const Device = require('../models/Device')
+const errors = require('../errors')
 
+const UserController = require('../controllers/user.controller')
+const DeviceController = require('../controllers/device.controller')
+const BetController = require('../controllers/bet.controller')
 
 
 const router = Router()
@@ -17,49 +22,45 @@ const router = Router()
 router.post('/create',
     file.array('images', 6),
     [
-        check('model', 'Incorect model').optional({checkFalsy: true}).isString(),
-        check('description', 'Min len of name is 25 symbols').isLength({min: 25}),
+        check('model', 'incorectModel').isString(),
+        check('description', 'minLengthDeviceDesc').isLength({min: 25}),
     ], 
     auth,
     async (req, res) => {
     try {
-        const errors = validationResult(req)
-        if(!errors.isEmpty()) {
-            return res.status(400).json({ errors: errors.array(), message: "Incorect data" })
-        }
+        const error = validationResult(req).array().pop()
+        if(error) { throw errors[error.msg] }
 
         const images = req.files.map((file) => file.filename)
 
-        const device = await deviceQueries.create(req.body, constants.status.SEARCH, images, req.user.userId)
-        if(!device) { return res.status(400).json({ message: "Incorect data in base" }) }
+        const device = await DeviceController.create(req.body, images, req.user.userId)
+
+        await device.save()
 
         res.status(200).json(device)
     } catch(error) {
-        res.status(500).json({ message: 'Что-то пошло не так...'})
+        if(error.custom) { return res.status(400).json(error) }
+        res.status(500).json(errors.unknown)
     }
 })
 
 router.post('/set-bet', auth, async (req, res) => {
     try {
-        const { id, price, description } = req.body
+        const { deviceId, price, description } = req.body
 
-        const user = await userQueries.get(req.user.userId)
-        if(!user) { return res.status(400).json({ message: "User not find" }) }
-        if(user.type !== 'MASTER') { return res.status(400).json({ message: "You is not master" }) }
-
-        const device = await deviceQueries.get(id)
-        if(!device) { return res.status(400).json({ message: "Device not find" }) }
-
-        const bet = new Bet({ price, description, client: device.owner, 
-            owner: req.user.userId, device: device._id })
-        await bet.save()
+        const master = await UserController.getMaster(req.user.userId)
+        const device = await DeviceController.get(deviceId)
+        const bet = await BetController.create(price, description, device, master)
 
         device.bets.push(bet._id)
+
+        await bet.save()
         await device.save()
 
         res.status(200).json(true)
     } catch(error) {
-        res.status(500).json({ message: 'Что-то пошло не так...'})
+        if(error.custom) { return res.status(400).json(error) }
+        res.status(500).json(errors.unknown)
     }
 })
 
@@ -67,16 +68,21 @@ router.post('/get-bet', auth, async (req, res) => {
     try {
         const { id } = req.body
 
-        const bet = await Bet.findOne({ _id: id })
+        const bet = await BetController.get(id)
 
         res.status(200).json(bet)
     } catch(error) {
-        res.status(500).json({ message: 'Что-то пошло не так...'})
+        if(error.custom) { return res.status(400).json(error) }
+        res.status(500).json(errors.unknown)
     }
 })
 
 router.post('/accept-bet', auth, async (req, res) => {
     try {
+        // client= getUser(id)
+        // bet = getBet(id)
+        // device = getFevice(bet.deivce)
+        // contract = createContract(bet, device, client)
         const { id } = req.body
 
         const bet = await Bet.findOne({ _id: id })
@@ -143,65 +149,6 @@ router.post('/cancel-bet', auth, async (req, res) => {
     }
 })
 
-router.post('/get-contract', auth, async (req, res) => {
-    try {
-        const { id } = req.body
-
-        const contract = await Contract.findOne({ _id: id })
-
-        if(!contract) { return res.status(400).json({ message: "Contract not find" }) }
-
-        
-        res.status(200).json(contract)
-    } catch(error) {
-        res.status(500).json({ message: 'Что-то пошло не так...'})
-    }
-})
-
-router.post('/accept-contract', auth, async (req, res) => {
-    try {
-        const { id, data, price } = req.body
-
-        const device =  await deviceQueries.get(id)
-        if(!device) { return res.status(400).json({ message: "Device not find" }) }
-
-        if(device.status !== constants.status.RESERVE) { 
-            return res.status(400).json({ message: "Device not search" }) 
-        }
-
-        const contract = await Contract.findOne({_id: device.contract})
-
-        if(contract.clientAccept && contract.masterAccept) { 
-            return res.status(400).json({ message: "Contract is confirmed" }) 
-        }
-
-        const isEdit = (contract.data !== data || contract.price !== price)
-
-        if(isEdit) { 
-            contract.data = data 
-            contract.price = price
-        } 
-
-        if(req.user.userId == contract.client) {
-            contract.clientAccept = true
-            contract.masterAccept = !isEdit
-        }
-        else if(req.user.userId  == contract.master) {
-            contract.masterAccept = true
-            contract.clientAccept = !isEdit
-        }
-        else { return res.status(400).json({ message: "You not owner" })  }
-
-        if(!isEdit) {  device.status = constants.status.PACT }
-        await contract.save()        
-        await device.save()
-        
-        res.status(200).json()
-    } catch(error) {
-        res.status(500).json({ message: 'Что-то пошло не так...'})
-    }
-})
-
 router.post('/accept', 
     [
         check('review.price', 'Отцените цену работы').isFloat({min: 1, max: 5}),
@@ -244,72 +191,6 @@ router.post('/accept',
 })
 
 //----------------------------------------------
-
-router.post('/devices', auth, async (req, res) => {
-    try {
-        const list = await deviceQueries.getDevices(req.user.userId)
-
-        res.status(200).json(list.map((item) => { return { id: item._id, updatedAt: item.updatedAt } }))
-    } catch(error) {
-        res.status(500).json({ message: 'Что-то пошло не так...'})
-    }
-})
-
-router.post('/auctions', auth, async (req, res) => {
-    try {
-        const list = await deviceQueries.getAuctions(req.user.userId)
-
-        res.status(200).json(list.map((item) => { return { id: item._id, updatedAt: item.updatedAt } }))
-    } catch(error) {
-        res.status(500).json({ message: 'Что-то пошло не так...'})
-    }
-})
-
-router.post('/orders', auth, async (req, res) => {
-    try {
-        const user = await userQueries.get(req.user.userId)
-        console.log(user.type);
-        if(user.type !== 'MASTER') { 
-            return res.status(400).json({ message: "User is not master" }) 
-        }
-        
-        const list = await deviceQueries.getOrders(user._id)
-
-        res.status(200).json(list.map((item) => { return { id: item._id, updatedAt: item.updatedAt } }))
-    } catch(error) {
-        res.status(500).json({ message: 'Что-то пошло не так...'})
-    }
-})
-
-router.post('/claims', auth, async (req, res) => {
-    try {
-        const user = await userQueries.get(req.user.userId)
-        if(user.type !== 'MASTER') { 
-            return res.status(400).json({ message: "User is not master" }) 
-        }
-        
-        const list = await deviceQueries.getClaims(user._id)
-
-        res.status(200).json(list.map((item) => { return { id: item._id, updatedAt: item.updatedAt } }))
-    } catch(error) {
-        res.status(500).json({ message: 'Что-то пошло не так...'})
-    }
-})
-
-router.post('/lots', auth, async (req, res) => {
-    try {
-        const user = await userQueries.get(req.user.userId)
-        if(user.type !== 'MASTER') { 
-            return res.status(400).json({ message: "User is not master" }) 
-        }
-
-        const list = await deviceQueries.getLots(user.cases)
-
-        res.status(200).json(list.map((item) => { return { id: item._id, updatedAt: item.updatedAt } }))
-    } catch(error) {
-        res.status(500).json({ message: 'Что-то пошло не так...'})
-    }
-})
 
 router.post('/load', auth, async (req, res) => {
     try {
@@ -360,21 +241,206 @@ router.post('/send', auth,
     }
 })
 
+//--------
 
-// ----- experements 
-
-
-router.post('/list', auth, async (req, res) => {
+router.post('/push-auction', auth,
+    async (req, res) => {
     try {
-        const list = (await deviceQueries.getList(req.user.userId)).map((item) => {
-            return { id: item._id, updatedAt: item.updatedAt }
-        })
+        const { id } = req.body
 
-        res.status(200).json(list)
+        const device = await deviceQueries.get(id)
+        if(!device) { return res.status(400).json({ message: "Такое устройство не найдено" }) }
+
+        if(device.status !== constants.status.CANCLE) { 
+            return res.status(400).json({ message: "Это устройство нельзя выставить на аукцион" }) 
+        }
+        if(device.owner != req.user.userId) { 
+            return res.status(400).json({ message: "Это устройство не принадлежит вам" }) 
+        }
+
+        device.status = constants.status.SEARCH
+        device.master = null
+
+        await device.save()
+
+        res.status(200).json(true)
     } catch(error) {
         res.status(500).json({ message: 'Что-то пошло не так...'})
     }
 })
 
+router.post('/get-contract', auth, async (req, res) => {
+    try {
+        const { id } = req.body
+
+        const contract = await Contract.findOne({ _id: id })
+
+        if(!contract) { return res.status(400).json({ message: "Такого контракта не существует" }) }
+        if(contract.client != req.user.userId && contract.master != req.user.userId) {
+            return res.status(400).json({ message: "Вы не держатель этого контракта" })
+        }
+        
+        res.status(200).json(contract)
+    } catch(error) {
+        res.status(500).json({ message: 'Что-то пошло не так...'})
+    }
+})
+
+router.post('/accept-contract', auth, async (req, res) => {
+    try {
+        const { id, price, data } = req.body
+
+        const device =  await deviceQueries.get(id)
+        if(!device) { return res.status(400).json({ message: "Такого дивайса не существует" }) }
+        if(device.status !== constants.status.RESERVE) { 
+            return res.status(400).json({ message: "На этот девайс невозможно заключить контракт" }) 
+        }
+
+        const contract = await Contract.findOne({_id: device.contract})
+        if(!contract) { return res.status(400).json({ message: "Такого контракта не существует" }) }
+
+        if(contract.clientAccept && contract.masterAccept) { 
+            return res.status(400).json({ message: "Контракт уже заключен" }) 
+        }
+
+        const isEdit = (contract.data !== data || contract.price !== price)
+
+        if(isEdit) { 
+            contract.data = data 
+            contract.price = price
+        } 
+
+        if(req.user.userId == contract.client) {
+            contract.clientAccept = true
+            contract.masterAccept = !isEdit
+        }
+        else if(req.user.userId  == contract.master) {
+            contract.masterAccept = true
+            contract.clientAccept = !isEdit
+        }
+        else { 
+            return res.status(400).json({ message: "Вы не держатель этого контракта" })  
+        }
+
+        if(!isEdit) {  device.status = constants.status.PACT }
+
+        await contract.save()        
+        await device.save()
+        
+        res.status(200).json(true)
+    } catch(error) {
+        res.status(500).json({ message: 'Что-то пошло не так...'})
+    }
+})
+
+router.post('/cancel-claim', auth,
+    async (req, res) => {
+    try {
+        const { id } = req.body
+
+        const device = await deviceQueries.get(id)
+        if(!device) { return res.status(400).json({ message: "Устройство не найдено" }) }
+
+        if(device.status !== constants.status.CHECK) { 
+            return res.status(400).json({ message: "Утройство не находиться в рассмотрении" }) 
+        }
+        if(device.master != req.user.userId) { 
+            return res.status(400).json({ message: "Устройсто отправлено не вам" }) 
+        }
+
+        device.status = constants.status.CANCLE
+        device.master = null
+
+        await device.save()
+
+        res.status(200).json(true)
+    } catch(error) {
+        res.status(500).json({ message: 'Что-то пошло не так...'})
+    }
+})
+
+router.post('/accept-claim', auth,
+    async (req, res) => {
+    try {
+        const { id } = req.body
+
+        const device = await deviceQueries.get(id)
+        if(!device) { return res.status(400).json({ message: "Устройство не найдено" }) }
+
+        if(device.status !== constants.status.CHECK) { 
+            return res.status(400).json({ message: "Утройство не находиться в рассмотрении" }) 
+        }
+        if(device.master != req.user.userId) { 
+            return res.status(400).json({ message: "Устройсто отправлено не вам" }) 
+        }
+
+        const contract = new Contract({ 
+            price: 0,
+            data: '',
+            device: device._id, 
+            client: device.owner, 
+            master: device.master
+        })
+
+        await contract.save()
+
+        device.status = constants.status.RESERVE
+        device.contract = contract._id
+
+        await device.save()
+
+        res.status(200).json(true)
+    } catch(error) {
+        res.status(500).json({ message: 'Что-то пошло не так...'})
+    }
+})
+
+router.post('/change-status', auth,
+    async (req, res) => {
+    try {
+        const { id, status } = req.body
+
+        const device = await deviceQueries.get(id)
+        if(!device) { return res.status(400).json({ message: "Устройство не найдено" }) }
+
+        if(device.status !== constants.status.PACT) { 
+            return res.status(400).json({ message: "Утройство не находиться в работе" }) 
+        }
+        if(device.master != req.user.userId) { 
+            return res.status(400).json({ message: "Устройсто находиться не у вас" }) 
+        }
+
+        device.workStatus = status
+        await device.save()
+
+        res.status(200).json(true)
+    } catch(error) {
+        res.status(500).json({ message: 'Что-то пошло не так...'})
+    }
+})
+
+router.post('/change-notes', auth,
+    async (req, res) => {
+    try {
+        const { id, notes } = req.body
+
+        const device = await deviceQueries.get(id)
+        if(!device) { return res.status(400).json({ message: "Устройство не найдено" }) }
+
+        // if(device.status !== constants.status.PACT) { 
+        //     return res.status(400).json({ message: "Утройство не находиться в работе" }) 
+        // }
+        // if(device.master != req.user.userId) { 
+        //     return res.status(400).json({ message: "Устройсто находиться не у вас" }) 
+        // }
+
+        device.notes = notes
+        await device.save()
+
+        res.status(200).json(true)
+    } catch(error) {
+        res.status(500).json({ message: 'Что-то пошло не так...'})
+    }
+})
 
 module.exports = router;

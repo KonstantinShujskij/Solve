@@ -5,7 +5,7 @@ import { FRONT_URL, ICONS } from '../const'
 import Input from '../components/base/Input'
 
 
-function InfoPhoneSection({phone, callback}) {
+function ConfirmPhoneSection({phone, callback}) {
     return (
         <>
         <div className='content'>
@@ -23,4 +23,4 @@ function InfoPhoneSection({phone, callback}) {
     )
 }
 
-export default InfoPhoneSection
+export default ConfirmPhoneSection

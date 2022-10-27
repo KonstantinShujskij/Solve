@@ -1,29 +1,67 @@
-import React from "react"
+import React, { useState } from "react"
+import { Link } from "react-router-dom"
+import { ICONS } from "../const"
 import useApi from "../hooks/api.hook"
-import { useNavigate } from "react-router-dom";
+import useUnmount from "../hooks/unmount.hook"
 import Input from "./base/Input"
-import useValidationInput from "../hooks/input.hook";
 
 
-export default function Contract({contract}) {
-    const { acceptBet } = useApi()
-    const navigate = useNavigate()
+export default function Contract({contract, price=null, terms=null}) {
+    const { infoUser, loadDevice } = useApi()
 
-    const value = useValidationInput(contract.data)
+    const [device, setDevice] = useState(null)
+    const [client, setClient] = useState({_id: '', name: ''})
+    const [master, setMaster] = useState({_id: '', name: ''})
+    
+    const load = () => {
+        if(price) { price.changeValue(contract.price) }
+        if(terms) { terms.changeValue(contract.data) }
 
-    const acceptHandler = (id) => {
-        acceptBet({ id })
-        navigate('/')
+        infoUser(contract.client).then((user) => setClient(user))
+        infoUser(contract.master).then((user) => setMaster(user))
+        loadDevice(contract.device).then((device) => setDevice(device))
     }
 
+    useUnmount(load)
+   
     return (
-        <div className="contract">
-            <Input input={value.bind}></Input>
-            <br />
-            <div className='buttons-row'>
-                <div className={`btn buttons-row__btn`}>{contract.masterAccept?'Подтверждено':'не подтверждено'}</div>
-                <button className='btn buttons-row__btn' onClick={() => acceptHandler(contract._id)}>Подтвердить</button>
+        <div className='card'>
+            <div className="device__row device__label">
+                <div className="device__icon icon">{ICONS.model}</div>
+                {device && <Link className="device__title" to={`/device/${device._id}`}>{device.model}</Link>}
             </div>
-        </div>        
+            <div className='card__hr'></div>
+            <div className="device__row device__label">
+                <div className="device__icon icon">{ICONS.bet}</div>
+                {(contract.clientAccept && contract.masterAccept && 
+                    <p className='text'>{contract.price}</p>
+                )}
+                {(price && (!contract.clientAccept || !contract.masterAccept) && 
+                    <Input input={price.bind} label="Цена" />
+                )}                    
+            </div>
+            <div className='card__hr'></div>
+            <div className="device__row">
+                <div className="device__icon icon">{ICONS.coment}</div>
+                {(contract.clientAccept && contract.masterAccept && 
+                    <p className='text'>{contract.data}</p>
+                )}
+                {(terms && (!contract.clientAccept || !contract.masterAccept) && 
+                    <textarea className='input textarea' {...terms.bind} placeholder='Условия контракта'></textarea>
+                )}  
+            </div>
+            <div className='card__hr'></div>
+            <div className="device__row device__label">
+                <div className="device__icon icon">{ICONS.user}</div>
+                <div className="device__title">{client.name}</div>
+                {contract.clientAccept && <div className="device__icon icon ml-auto" style={{color: "#3DA9FC"}}>{ICONS.ok}</div>}
+            </div>
+            <div className='card__hr'></div>
+            <div className="device__row device__label">
+                <div className="device__icon icon">{ICONS.master}</div>
+                <Link className="device__title" to={`/profile/${master._id}`}>{master.name}</Link>
+                {contract.masterAccept && <div className="device__icon icon ml-auto" style={{color: "#3DA9FC"}}>{ICONS.ok}</div>}
+            </div>
+        </div>
     )
 }

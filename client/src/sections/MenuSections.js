@@ -1,16 +1,16 @@
 import React from 'react'
 import { useSelector } from "react-redux"
+import * as selectors from '../selectors'
 import { NavLink } from 'react-router-dom'
 import { ReactSVG } from 'react-svg'
 import { FRONT_URL } from '../const'
-import * as selectors from '../selectors'
 
 
-function MenuSection({className}) {
+function MenuSection({className=''}) {
     const userType = useSelector(selectors.userType)
 
     return (
-        <div className={`menu ${className? className : ''}`}>
+        <div className={`menu ${className}`}>
             {(userType === 'CLIENT') && <>
                 <NavLink className='menu__item' to="/">
                     <ReactSVG className='menu__icon' src={`${FRONT_URL}/icons/Home.svg`}></ReactSVG>
@@ -22,7 +22,7 @@ function MenuSection({className}) {
                 </NavLink>
             </>}
             {(userType === 'MASTER') && <>
-                <NavLink className='menu__item' to="/">
+                <NavLink className='menu__item' to="/work-list">
                     <ReactSVG className='menu__icon' src={`${FRONT_URL}/icons/Home.svg`}></ReactSVG>
                     <div className='menu__label'>В роботі</div>
                 </NavLink>

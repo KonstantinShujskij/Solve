@@ -190,6 +190,7 @@ body {
 
 .separator__text {
     padding: 0 8px;
+    flex-shrink: 0;
 }
 
 .content {
@@ -260,6 +261,7 @@ body {
     font-weight: 500;
     cursor: pointer;
     color: #3DA9FC;
+    text-decoration: none;
 }
 
 
@@ -299,15 +301,21 @@ body {
 .w-100 { width: 100%; }
 .d-flex { display: flex; }
 .text-center { text-align: center; }
+.text-left { text-align: left; }
 .mt-auto { margin-top: auto; }
 .mb-auto { margin-bottom: auto; }
 .mr-auto { margin-right: auto; }
 .ml-auto { margin-left: auto; }
 .flex-jc { justify-content: center; }
 
-.client, .master {
+.client {
     padding-bottom: 0;
     padding-top: 8px;
+}
+
+.master {
+    padding-top: 24px;
+    padding-bottom: 0;
 }
 
 .menu {
@@ -446,3 +454,99 @@ body {
 .profile, .search-page {
     padding-bottom: 0;
 }
+
+.contract-page {
+    padding-bottom: 0;
+}
+
+.filter-button {
+    text-decoration: none;
+    font-size: 24px;
+    color: #094067;
+}
+
+.filter-card {
+    padding: 16px 0;
+}
+
+.filter-card .separator {
+    padding: 6px 0;
+}
+
+.filter__item {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 16px;
+    border-bottom: 1px solid #D1D1D1;
+}
+
+.filter__point {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    border: 1px solid #737373;
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.filter__point_active::after {
+    content: '';
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background-color: #737373;
+}
+
+.load-observer {
+    height: 2px;
+    width: 100%;
+    opacity: 0;
+}
+
+.device__edit {
+    font-size: 24px;
+    color: #5F6C7B;
+}
+
+.device__edit_active {
+    color: #3DA9FC;
+}
+
+.code__input {
+    width: 0;
+    overflow: hidden;
+}
+
+.code {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.code__item {
+    width: 42px;
+    height: 42px;
+    background: #EFEFEF;
+    border: 1px solid #DEDEDE;
+    border-radius: 10px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-family: 'Roboto';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 24px;
+    line-height: 28px;
+    color: #094067;
+}
+
+.code:focus-within .code__item_fill {
+    border: 1px solid #3DA9FC;
+} 

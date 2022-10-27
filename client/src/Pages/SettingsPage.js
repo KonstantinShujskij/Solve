@@ -1,26 +1,33 @@
 import React from 'react'
 import { useSelector } from "react-redux"
-
 import { Outlet } from "react-router-dom"
-import * as selectors from '../selectors'
-import { AVATAR, FRONT_URL } from '../const'
 
+import * as selectors from '../selectors'
 import useApi from '../hooks/api.hook'
 import useUser from '../hooks/user.hook'
+import MenuSection from '../sections/MenuSections'
 import BackSection from '../sections/BackSection'
 import Avatar from '../components/Avatar'
 
+import { AVATAR, FRONT_URL } from '../const'
+
 import "../styles/settings.css"
-import MenuSection from '../sections/MenuSections'
+import useAlert from '../hooks/alert.hook'
 
 
 function SettingsPage() {
     const { changeAvatar } = useApi()
     const { refreshUser } = useUser()
+    const { pushMess } = useAlert()
 
     const user = useSelector(selectors.user)
 
-    const saveAvatar = async (file) => { changeAvatar(file).then(() => refreshUser()) }
+    const saveAvatar = (file) => { changeAvatar(file).then((res) => {
+        if(!res) { return }
+
+        pushMess('Ваш аватар успешно изменен')
+        refreshUser()
+    })}
 
     return (
        <div className='container settings'>
@@ -47,4 +54,4 @@ function SettingsPage() {
     )
 }
 
-export default SettingsPage;
+export default SettingsPage

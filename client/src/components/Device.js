@@ -2,22 +2,40 @@ import React, { useState } from "react"
 import useApi from "../hooks/api.hook"
 import '../styles/device.css'
 import { ICONS } from "../const"
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import useUnmount from "../hooks/unmount.hook"
+import { setCurrentDevice } from "../redux/actions"
+import { useDispatch } from "react-redux"
+import useAlert from "../hooks/alert.hook"
 
 const nope = () => {}
 
 export default function Device({device, refresh=nope}) {
-    const { infoUser, cancelBet } = useApi()
+    const { infoUser, cancelBet, pushAuction } = useApi()
+    const { pushMess } = useAlert()
+    const navigate = useNavigate()
+    const dispatch = useDispatch()
 
     const [master, setMaster] = useState({})
 
-    const load = () => {
-        if(device.master) { infoUser(device.master).then((user) => setMaster(user)) }
-    }
+    const load = () => { if(device.master) { infoUser(device.master).then((user) => setMaster(user)) } }
 
     const cancelHandler = () => { cancelBet(device.bet).then(refresh) }
  
+    const placeAuctionHandler = () => {
+        pushAuction(device._id).then((res) => { 
+            if(!res) { return }
+
+            pushMess('Устройство выставленно на аукцион')
+            load()
+        })
+    }
+
+    const selectMasterHandler = () => {
+        dispatch(setCurrentDevice(device._id))
+        navigate('/search') 
+    }
+
     useUnmount(load)
 
     return (
@@ -40,19 +58,32 @@ export default function Device({device, refresh=nope}) {
 
             {(device.status === 'RESERVE' && <>
                 <Link className="button w-100 card__button" to={`/contract/${device.contract}`}>Подписать Контракт</Link>
-                <button className="button w-100 card__button red" onClick={cancelHandler}>Отменить свой выбор</button>
+                {(device.bet && 
+                    <button className="button w-100 card__button red" onClick={cancelHandler}>Отменить свой выбор</button>
+                )}
             </>)}
 
             {(device.status === 'CHECK' && <>
+                <div className="device__row">
+                    <div className="device__icon icon" style={{color: "#FCC73D"}}>{ICONS.circle}</div>
+                    <div className="device__text">
+                        <p>Статус:</p>
+                        <p>Находиться на рассмотрении</p>
+                    </div>
+                </div>
                 <div className="card__hr"></div>
-                <button className="btn">Подписать Контракт</button>
+                <div className="device__row">
+                    <div className="device__icon icon">{ICONS.place}</div>
+                    <div className="device__text">
+                        <p>Знаходиться у:</p>
+                        <Link className="device__link" to={`/profile/${device.master}`}>{master.name}</Link>
+                    </div>
+                </div> 
             </>)}
 
             {(device.status === 'CANCEL' && <>
-                <div className="device__hr"></div>
-                <button className="btn">Выставить заказ на аукцион</button>
-                <div className="device__hr"></div>
-                <button className="btn">Отослать заказ конкретному исполнителю</button>
+                <button className="button w-100 card__button" onClick={placeAuctionHandler}>Выставить заказ на аукцион</button>
+                <button className="button w-100 card__button red" onClick={selectMasterHandler}>Выбрать исполнителя</button>
             </>)}
 
             {(device.status === 'PACT' && <>

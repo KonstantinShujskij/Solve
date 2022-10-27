@@ -8,6 +8,7 @@ import useAuth from '../hooks/auth.hook'
 import useValidationInput from '../hooks/input.hook'
 
 import Input from '../components/base/Input'
+import { Link } from 'react-router-dom'
 
 function SignupSection() {
     const { loginUser } = useApi()
@@ -38,8 +39,8 @@ function SignupSection() {
                 <button className='button w-100 card__button' onClick={() => authHandler()}>Зареєструватися</button>
                 
                 <p className='subtext text-center card__subtext'>
-                    Реєструючись ви погоджуєтеся з <span className='link'>Умовами обслуговування</span>
-                    та<span className='link'>Політикою конфіденційності</span>
+                    Реєструючись ви погоджуєтеся з <Link className='link' to='/rules'>Умовами обслуговування</Link>
+                    та <Link className='link' to='/policy'>Політикою конфіденційності</Link>
                 </p>
             </div>
         </>

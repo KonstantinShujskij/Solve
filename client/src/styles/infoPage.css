@@ -13,6 +13,11 @@
     margin-bottom: 16px;
 }
 
+.code-seal {
+    width: 188px !important;
+    margin-bottom: 16px;
+}
+
 .write-seal::before {
     padding-top: 104.2% !important;
 }
@@ -23,6 +28,10 @@
 
 .company-seal::before {
     padding-top: 79.2% !important;
+}
+
+.code-seal::before {
+    padding-top: 77.6% !important;
 }
 
 .map-wrap {

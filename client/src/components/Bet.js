@@ -47,9 +47,9 @@ export default function Bet({bet, refresh}) {
                 <button className='button w-100 card__button red' onClick={cancelHandler}>Отказаться</button>
             )}
 
-            {(bet.accept && bet.client === userId && 
+            {(bet.accept && bet.client === userId && <>
                 <button className='button w-100 card__button' onClick={cancelHandler}>Отменить</button>
-            )}
+            </>)}
 
             {(!bet.accept && bet.client === userId && 
                 <button className='button w-100 card__button' onClick={acceptHandler}>Принять</button>

@@ -12,10 +12,12 @@ import * as selectors from '../selectors'
 import Input from '../components/base/Input'
 import BackSection from '../sections/BackSection'
 import { setCurrentDevice } from '../redux/actions'
+import useAlert from '../hooks/alert.hook'
 
 function CreatePage() {
     const navigate = useNavigate()
     const { createDevice } = useApi()
+    const { pushMess } = useAlert()
     const dispatch = useDispatch()
 
     const categories = useSelector(selectors.categories)
@@ -33,8 +35,10 @@ function CreatePage() {
         images.list.forEach((item) => form.append('images', item.file))
 
         const device = await createDevice(form)
+
         if(device) { 
             dispatch(setCurrentDevice(device._id))
+            pushMess('Устройство успешно создано')
             navigate(to) 
         }
     }

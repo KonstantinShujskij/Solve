@@ -1,16 +1,17 @@
 import React from 'react'
 import { useSelector } from 'react-redux'
-import Contacts from '../components/Contacts'
 import useApi from '../hooks/api.hook'
-
-import useContacts from '../hooks/contacts.hook'
 import useUser from '../hooks/user.hook'
+import useAlert from '../hooks/alert.hook'
+import useContacts from '../hooks/contacts.hook'
 import * as selectors from '../selectors'
+import Contacts from '../components/Contacts'
 
 
 function SettingsSocialSection() {
-    const { refreshUser } = useUser()
     const { changeContact } = useApi()
+    const { refreshUser } = useUser()
+    const { pushMess } = useAlert()
 
     const user = useSelector(selectors.user)
     
@@ -21,15 +22,19 @@ function SettingsSocialSection() {
         facebook: user.facebook
     }) 
 
-    const saveContactsHandler = () => { changeContact({...contact.values}).then((res) => { 
-        console.log(res);
-        refreshUser() 
-    })}
+    const saveContactsHandler = () => { 
+        changeContact({...contact.values}).then((res) => { 
+            if(!res) { return }
+
+            pushMess('Ваши контактные данные изменены')
+            refreshUser() 
+        })
+    }
 
     return (
         <div className='card'>
-            <Contacts {...contact.bind} ></Contacts>
-            <button className='button w-100 card__button' onClick={() => saveContactsHandler()}>Сохранить</button>
+            <Contacts {...contact.bind} />
+            <button className='button w-100 card__button' onClick={saveContactsHandler}>Сохранить</button>
         </div>
     )
 }

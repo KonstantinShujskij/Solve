@@ -18,6 +18,7 @@ app.use('/store', express.static(path.join(__dirname, 'store')));
 app.use('/api/auth', require('./routes/auth.routes'))
 app.use('/api/user', require('./routes/user.routes'))
 app.use('/api/device', require('./routes/device.routes'))
+app.use('/api/devices', require('./routes/devices.routes'))
 app.use('/api/info', require('./routes/info.routes'))
 
 

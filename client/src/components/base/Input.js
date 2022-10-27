@@ -10,7 +10,7 @@ export default function Input({input, icon, label='', type='input'}) {
         <div className={classNames({
             'input': true, 
             'input_focus': focus,
-            'input_fill': !!input.value
+            'input_fill': !!input.value,
         })}>
             {(!!icon && 
                 <div className={classNames({

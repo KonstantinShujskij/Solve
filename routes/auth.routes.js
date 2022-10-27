@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken')
 const config = require('config')
 const passport = require('passport')
 const userQueries = require('../queries/user.queries')
-const generateJwt = require('../jwt')
+const { generateLoginJwt } = require('../jwt')
 
 
 const router = Router()
@@ -15,7 +15,7 @@ router.get('/google/redirect', passport.authenticate('google', { session: false 
     const baseUrl = config.get('baseUrl')
     const user = req.user
 
-    const token = generateJwt(user._id)
+    const token = generateLoginJwt(user._id)
     res.redirect(`${baseUrl}/window?token=${token}&id=${user._id}`)
 })
 
@@ -36,8 +36,8 @@ router.post('/login',
 
         if(error) { return res.status(400).json({ message: error }) }
 
-        const token = generateJwt(user._id)
-        res.json({ token, userId: user.id, isCompletely: user.info })
+        const token = generateLoginJwt(user._id)
+        res.json({ token, userId: user.id, isPhone: !!user.phone, isCompletely: user.info })
 
     } catch(error) {
         res.status(500).json({ message: 'Что-то пошло не так...'})

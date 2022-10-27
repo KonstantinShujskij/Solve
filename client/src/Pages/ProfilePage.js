@@ -1,35 +1,41 @@
 import React, { useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { FRONT_URL, ICONS, AVATAR } from '../const'
+import { FRONT_URL, AVATAR } from '../const'
 import useApi from '../hooks/api.hook'
 import '../styles/profile.css'
 import useUnmount from '../hooks/unmount.hook'
 import BackSection from '../sections/BackSection'
 import Review from '../components/Review'
 import MenuSection from '../sections/MenuSections'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import * as selectors from '../selectors'
+import { removeCurrentDevice } from '../redux/actions'
+import { getMedium } from '../functions'
+import useAlert from '../hooks/alert.hook'
+import ContactPreview from '../components/ContactPreview'
 
-
-function getMedium(arr, none=0) {
-    if(arr.length === 0) { return none }
-    return arr.reduce((sum, value) => (sum + value)) / arr.length
-}
 
 function ProfilePage() {
     const params = useParams()
+    const dispatch = useDispatch()
 
     const { infoUser, sendDevice } = useApi()
+    const { pushMess } = useAlert()
 
     const [user, setUser] = useState({name: '', phone: '', avatar: AVATAR, reviews: []})
 
     const currentDevice = useSelector(selectors.currentDevice)
 
-    useUnmount(() => { infoUser(params.id).then((user) => setUser(user)) })
+    const load = () => { infoUser(params.id).then((user) => setUser(user)) }
+    useUnmount(load)
 
     const sendHandler = () => {
         sendDevice(currentDevice, params.id).then((res) => {
-            console.log(res);
+            if(!res) { return }
+
+            pushMess('Предложение успешно отправлено')
+            dispatch(removeCurrentDevice())
+            load()
         })
     }
 
@@ -78,20 +84,8 @@ function ProfilePage() {
                 </div>
 
                 <div className='card'>
-                    <a className='profile__phone' href={`tel:${user.phone}`}>
-                        <div className='icon profile-phone__icon'>{ICONS.mobile}</div>
-                        <div>{user.phone}</div>
-                    </a>
-                    <div className='profile__social-list'>
-                        <a className={`profile__social ${!user.telegram? 'profile__social_none' : ''}`}  
-                           href={`https://t.me/${user.telegram}`} target="_blank" rel="noreferrer">{ICONS.telegram}</a>
-                        <a className={`profile__social ${!user.viber? 'profile__social_none' : ''}`}  
-                           href={`viber://chat?number=%2B${user.viber}`} target="_blank" rel="noreferrer">{ICONS.viber}</a>
-                        <a className={`profile__social ${!user.instagram? 'profile__social_none' : ''}`}  
-                           href={`https://instagram.com/${user.instagram}`} target="_blank" rel="noreferrer">{ICONS.instagram}</a>
-                        <a className={`profile__social ${!user.whatsapp? 'profile__social_none' : ''}`}  
-                           href={`https://wa.me/${user.whatsapp}`} target="_blank" rel="noreferrer">{ICONS.whatsapp}</a>
-                    </div>
+                    <ContactPreview user={user} />
+                    <div className='card__space'></div>
                     <div className='profile__adres'>
                         <img className='profile-adres__icon' src={`${FRONT_URL}/images/map-point.svg`} alt='map' />
                         <div className='profile-adres__info'>

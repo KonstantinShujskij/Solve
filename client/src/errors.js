@@ -1,1 +1,1 @@
-export const BAD_AUTH = 'Not Authorization'
+export const BAD_AUTH = 'Вы не авторизованы'

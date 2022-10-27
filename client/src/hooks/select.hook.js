@@ -1,8 +1,8 @@
 import { useState } from "react"
 
-export default function useSelect(initialValue = [], mult=true) {
-    const [value, setValue] = useState(mult? [] : null)
-    const [list, setList] = useState(initialValue)
+export default function useSelect(initialList = [], mult=true, initialValue=null) {
+    const [value, setValue] = useState(initialValue? initialValue : mult? [] : null)
+    const [list, setList] = useState(initialList)
     
     const action = (item) => {
         if(list.indexOf(item) === -1) { return }

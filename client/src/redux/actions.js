@@ -1,4 +1,6 @@
-import { CLEAR_MESS, CLEAR_ERROR, LOGIN, LOGOUT, REMOVE_DEVICES, REMOVE_USER, SET_CAT, SET_CURRENT_DEVICE, SET_DEVICES, SET_ERROR, SET_MESS, SET_USER, PUSH_DEVICE } from "./types";
+import { CLEAR_MESS, CLEAR_ERROR, LOGIN, LOGOUT, REMOVE_DEVICES, 
+    REMOVE_USER, SET_CAT, SET_CURRENT_DEVICE, SET_DEVICES, SET_ERROR, 
+    SET_MESS, SET_USER, PUSH_DEVICE, SET_AUCTION_FILTER_CASES, SET_AUCTION_FILTER_DATE, SET_AUCTION_FILTER_BETS, SET_ORDER_FILTER_DATE, SET_ORDER_FILTER_CASES, SET_ORDER_FILTER_STATUS } from "./types";
 
 export function toLogin(token, userId) {
     return {
@@ -87,10 +89,6 @@ export function clearError() {
     }
 }
 
-
-
-// ----------------
-
 export function addDevice(device) {
     return {
         type: PUSH_DEVICE,
@@ -101,5 +99,49 @@ export function addDevice(device) {
 export function removeDevices() {
     return {
         type: REMOVE_DEVICES,
+    }
+}
+
+//-----------------------------
+
+export function setAuctionFilterCases(cases) {
+    return {
+        type: SET_AUCTION_FILTER_CASES,
+        payload: cases
+    }
+}
+
+export function setAuctionFilterDate(direction) {
+    return {
+        type: SET_AUCTION_FILTER_DATE,
+        payload: direction
+    }
+}
+
+export function setAuctionFilterBets(direction) {
+    return {
+        type: SET_AUCTION_FILTER_BETS,
+        payload: direction
+    }
+}
+
+export function setOrderFilterStatus(list) {
+    return {
+        type: SET_ORDER_FILTER_STATUS,
+        payload: list
+    }
+}
+
+export function setOrderFilterCases(cases) {
+    return {
+        type: SET_ORDER_FILTER_CASES,
+        payload: cases
+    }
+}
+
+export function setOrderFilterDate(direction) {
+    return {
+        type: SET_ORDER_FILTER_DATE,
+        payload: direction
     }
 }
